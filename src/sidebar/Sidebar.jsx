@@ -3,20 +3,15 @@ import "./Sidebar.css";
 import * as helpers from "../helpers/helpers";
 
 import TOC from "./components/toc/TOC";
-
-//import TOCv1 from './components/toc/TOCV1.jsx'
-//import TOCv2 from './components/toc/TOCv2.jsx'
 import SidebarItemList from "./SidebarItemList";
 import Reports from "./components/reports/Reports";
 import MyMaps from "./components/mymaps/MyMaps";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import SidebarComponent from "react-sidebar";
-//import MenuButton from './MenuButton.jsx';
 import ComponentsConfig from "../config.json";
 import SidebarSlim from "./SidebarSlim.jsx";
 
-// TEST COMMENT
 class Sidebar extends Component {
   constructor(props) {
     super(props);
@@ -115,7 +110,6 @@ class Sidebar extends Component {
   async componentDidMount() {
     // IMPORT TOOLS FROM CONFIG
     const tools = ComponentsConfig.sidebarToolComponents;
-    let index = 0;
     tools.map(async component => await this.addComponent(component, "tools"));
 
     // IMPORT THEMES FROM CONFIG
@@ -161,7 +155,7 @@ class Sidebar extends Component {
   initToolAndThemeUrlParameter = () => {
     var i = 0;
     var isLoading = false;
-    for (var i = 1; i <= 100; i++) {
+    for (i = 1; i <= 100; i++) {
       if (isLoading) return;
       // eslint-disable-next-line
       (index => {
@@ -259,7 +253,7 @@ class Sidebar extends Component {
       this.setState({ tabIndex: 0 });
     }
     else if (tabName === "tools"){
-      this.onMyMapsEditing(true);
+      this.onMyMapsEditing(false);
       this.setState({ tabIndex: 1 });
     }
     else if (tabName === "mymaps") {
@@ -374,7 +368,7 @@ class Sidebar extends Component {
       helpers.addAppStat("Tab", "Layers");
     }
     else if (tabIndex === 1) {
-      this.onMyMapsEditing(true);
+      this.onMyMapsEditing(false);
       helpers.addAppStat("Tab", "Tools");
     }
     else if (tabIndex === 2) { 
@@ -382,7 +376,7 @@ class Sidebar extends Component {
       helpers.addAppStat("Tab", "MyMaps");
     }
     else if (tabIndex === 3) {
-      this.onMyMapsEditing(true);
+      this.onMyMapsEditing(false);
       helpers.addAppStat("Tab", "Themes");
     }
     else if (tabIndex === 4) {
