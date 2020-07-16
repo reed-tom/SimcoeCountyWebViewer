@@ -12,7 +12,7 @@
   "appStatsUrl": "https://intra.dev.regionalgis.mto.gov.on.ca:5443/WebApi/appStats/",
   "apiUrl": "https://intra.dev.regionalgis.mto.gov.on.ca:5443/WebApi/",
   "termsUrl": "https://intra.dev.regionalgis.mto.gov.on.ca/geomatics/splash/3/view",
-  "helpUrl": "https://intra.dev.regionalgis.mto.gov.on.ca/geomatics/kb/?active=1&recent=0&me=0&area=14&type=0",
+  "helpUrl": "https://intra.dev.regionalgis.mto.gov.on.ca/geomatics/kb/?active=1&recent=0&me=0&area=15&type=0",
   "ieWarningUrl": "https://intra.dev.regionalgis.mto.gov.on.ca/geomatics/splash/2/view",
   "propertyReportUrl": "https://intra.dev.regionalgis.mto.gov.on.ca:5443/WebApi/propertyreport",
   "imageViewerUrl": "https://intra.dev.regionalgis.mto.gov.on.ca/geomatics/image_viewer/?path=", 
