@@ -4,6 +4,8 @@ import * as helpers from "../helpers/helpers";
 import BasemapConfig from "./basemapSwitcherConfig.json";
 import { Group as LayerGroup } from "ol/layer.js";
 import xml2js from "xml2js";
+import { Vector as VectorSource } from "ol/source.js";
+import { Vector as VectorLayer } from "ol/layer.js";
 
 class BasemapSwitcher extends Component {
   constructor(props) {
@@ -33,7 +35,7 @@ class BasemapSwitcher extends Component {
   onMapLoad() {
     let index = 0;
     // LOAD WORLD LAYER
-    if (BasemapConfig.worldImageryService !== undefined || BasemapConfig.worldImageryService !== "") {
+    if (BasemapConfig.worldImageryService !== undefined && BasemapConfig.worldImageryService !== "") {
       var worldImageryLayer = helpers.getESRITileXYZLayer(BasemapConfig.worldImageryService);
       worldImageryLayer.setZIndex(0);
       //worldImageryLayer.setMinResolution(300);
@@ -58,6 +60,8 @@ class BasemapSwitcher extends Component {
           layer = helpers.getArcGISTiledLayer(service.url);
         } else if (service.type === "ARC_REST"){
           layer = helpers.getESRITileXYZLayer(service.url);
+        }else{
+          layer = new VectorLayer({source: new VectorSource()});
         }
 
         // LAYER PROPS
