@@ -1,4 +1,5 @@
 import React from "react";
+import localConfig from "./config.json";
 
 export const LHRSPoint = props => {
     const inputMsg = "";
@@ -58,6 +59,18 @@ export const LHRSRow = props => {
     );
 };
 
+export const SmartCLReportLink = props => {
+    const reportConfig = localConfig.smartcl;
+    const reportLink = (url, params, startX, startY, endX, endY, hwy) => `${url}?${params.startX}=${startX}&${params.startY}=${startY}&${params.endX}=${endX}&${params.endY}=${endY}&${params.hwy}=${hwy}`
+
+
+    return (
+        <div className="sc-lhrs-row sc-arrow">
+             <label>{props.label}:</label>
+            <span><a href={reportLink(reportConfig.report_url, reportConfig.params, props.startX,props.startY, props.endX, props.endY, props.hwy)}  rel="noopener noreferrer" target="_blank">{props.label}</a></span>
+        </div>
+    )
+}
 
 
 export const LHRSInputRow = props => {

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./LHRS.css";
 import * as helpers from "../../../../helpers/helpers";
 import PanelComponent from "../../../PanelComponent";
-import { LHRSPoint,LHRSInputRow,LHRSRow } from "./LHRSSubComponents.jsx";
+import { LHRSPoint,LHRSInputRow,LHRSRow,SmartCLReportLink } from "./LHRSSubComponents.jsx";
 import { transform } from "ol/proj.js";
 import Select from "react-select";
 import Switch from "react-switch";
@@ -789,6 +789,14 @@ class LHRS extends Component {
                   inputId="sc-lhrs-section-length" 
                   readOnly={true}
                   placeholer="" />
+
+                  <SmartCLReportLink 
+                    label="Smart CL - Segment Report" 
+                    startX={this.state.inputLatLongXCoordsA} 
+                    startY={this.state.inputLatLongYCoordsA} 
+                    endX={this.state.inputLatLongXCoordsB} 
+                    endY={this.state.inputLatLongYCoordsB} 
+                    hwy={this.state.a_hwy} />
                 </div>
               
              
