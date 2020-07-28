@@ -56,6 +56,11 @@ class LHRS extends Component {
       a_basepoint: null, 
       a_offset: null,
       a_snapped_distance: null,
+      a_clrs_route: null,
+      a_clrs_measurement: null,
+      a_smartcl_twp:null,
+      a_smartcl_route:null,
+      a_smartcl_chainage:null,
       //values for point b
       b_valid:false,
       b_lat: null,
@@ -65,6 +70,11 @@ class LHRS extends Component {
       b_basepoint: null, 
       b_offset: null,
       b_snapped_distance: null,
+      b_clrs_route: null,
+      b_clrs_measurement: null,
+      b_smartcl_twp:null,
+      b_smartcl_route:null,
+      b_smartcl_chainage:null,
 
       linearFeatureLength: null,
       allowMapActions: true
@@ -159,6 +169,11 @@ class LHRS extends Component {
       basepoint: null, 
       offset: null,
       snapped_distance: null,
+      clrs_route : null,
+      clrs_distance: null,
+      smartcl_twp: null,
+      smartcl_route: null,
+      smartcl_chainage: null,
       valid: false
     };
     switch(pointName){
@@ -172,6 +187,11 @@ class LHRS extends Component {
           basepoint: this.state.a_basepoint, 
           offset: this.state.a_offset,
           snapped_distance: this.state.a_snapped_distance,
+          clrs_route :this.state.a_clrs_route,
+          clrs_distance :this.state.a_clrs_measurement,
+          smartcl_twp:this.state.a_smartcl_twp,
+          smartcl_route :this.state.a_smartcl_route,
+          smartcl_chainage :this.state.a_smartcl_chainage,
           valid:this.state.a_valid
         };
         break;
@@ -185,6 +205,11 @@ class LHRS extends Component {
           basepoint: this.state.b_basepoint, 
           offset: this.state.b_offset,
           snapped_distance: this.state.b_snapped_distance,
+          clrs_route :this.state.b_clrs_route,
+          clrs_distance :this.state.b_clrs_measurement,
+          smartcl_twp:this.state.b_smartcl_twp,
+          smartcl_route :this.state.b_smartcl_route,
+          smartcl_chainage :this.state.b_smartcl_chainage,
           valid:this.state.b_valid
         };
         break;
@@ -214,6 +239,11 @@ class LHRS extends Component {
                       a_offset: pointObj.offset,
                       a_snapped_distance: pointObj.snapped_distance,
                       a_valid: pointObj.valid,
+                      a_clrs_route: pointObj.clrs_route,
+                      a_clrs_measurement: pointObj.clrs_distance,
+                      a_smartcl_twp: pointObj.smartcl_twp,
+                      a_smartcl_route: pointObj.smartcl_route,
+                      a_smartcl_chainage: pointObj.smartcl_chainage,
                       inputLatLongXCoordsA: pointObj.lat, 
                       inputLatLongYCoordsA: pointObj.long
                     },()=>{
@@ -235,6 +265,11 @@ class LHRS extends Component {
                       b_offset: pointObj.offset,
                       b_snapped_distance: pointObj.snapped_distance,
                       b_valid: pointObj.valid,
+                      b_clrs_route: pointObj.clrs_route,
+                      b_clrs_measurement: pointObj.clrs_distance,
+                      b_smartcl_twp: pointObj.smartcl_twp,
+                      b_smartcl_route: pointObj.smartcl_route,
+                      b_smartcl_chainage: pointObj.smartcl_chainage,
                       inputLatLongXCoordsB: pointObj.lat, 
                       inputLatLongYCoordsB: pointObj.long
                     }, ()=>{
@@ -281,7 +316,7 @@ class LHRS extends Component {
   }
   _getLHRSActions = () => {
       let items = [
-                      {label:"Select Point", value:"selectPoint"},
+                      {label:"Select on Map", value:"selectPoint"},
                       {label:"Enter Lat/Long", value:"enterLatLong"},
                       {label:"Enter Hwy/Distance", value:"enterHwy"},
                       {label:"Enter Basepoint/Offset", value:"enterBasepoint"}
@@ -371,14 +406,14 @@ class LHRS extends Component {
           inputAType = "lat";
           inputAReadOnly = true;
           inputAPlaceholer = "(listening for input)";
-          inputAHidden = false;
+          inputAHidden = true;
           inputBLabel = "Long";
           inputBValue = selectedPoint==="pointA"? this.state.inputLatLongYCoordsA : this.state.inputLatLongYCoordsB;
           inputBType = "long";
           inputBReadOnly = true;
           inputBPlaceholer = "(listening for input)";
           allowMapActions =true;
-          inputBHidden = false;
+          inputBHidden = true;
           break;
         case "enterLatLong":
           inputALabel = "Lat";
@@ -482,6 +517,11 @@ class LHRS extends Component {
         pointObj.basepoint = result.basepoint; 
         pointObj.offset = result.lhrs_offset;
         pointObj.snapped_distance = result.snapping_distance;
+        pointObj.clrs_route = result.clrs_route;
+        pointObj.clrs_distance = result.clrs_measurement;
+        pointObj.smartcl_twp = result.smartcl_twp;
+        pointObj.smartcl_route = result.smartcl_route;
+        pointObj.smartcl_chainage = result.smartcl_chainage;
         pointObj.valid = true;
         
       }else{
@@ -493,6 +533,11 @@ class LHRS extends Component {
         pointObj.basepoint=basepoint; 
         pointObj.offset=offset;
         pointObj.snapped_distance=null;
+        pointObj.clrs_route=null;
+        pointObj.clrs_distance =null;
+        pointObj.smartcl_twp=null;
+        pointObj.smartcl_route =null;
+        pointObj.smartcl_chainage=null;
         pointObj.valid = false;
         helpers.showMessage("Not Found", "No LHRS Data Found.", helpers.messageColors.green, 1500, true);
       }
@@ -517,6 +562,11 @@ class LHRS extends Component {
         pointObj.basepoint = result.basepoint; 
         pointObj.offset = result.lhrs_offset;
         pointObj.snapped_distance = result.snapping_distance;
+        pointObj.clrs_route = result.clrs_route;
+        pointObj.clrs_distance = result.clrs_measurement;
+        pointObj.smartcl_twp = result.smartcl_twp;
+        pointObj.smartcl_route = result.smartcl_route;
+        pointObj.smartcl_chainage = result.smartcl_chainage;
         pointObj.valid = true;
       }else{
         pointObj.lat = null;
@@ -526,6 +576,11 @@ class LHRS extends Component {
         pointObj.basepoint=null; 
         pointObj.offset=null;
         pointObj.snapped_distance=null;
+        pointObj.clrs_route=null;
+        pointObj.clrs_distance =null;
+        pointObj.smartcl_twp=null;
+        pointObj.smartcl_route =null;
+        pointObj.smartcl_chainage=null;
         pointObj.valid = false;
         helpers.showMessage("Not Found", "No LHRS Data Found.", helpers.messageColors.green, 1500, true);
       }
@@ -550,6 +605,11 @@ class LHRS extends Component {
             pointObj.basepoint=result.basepoint; 
             pointObj.offset=result.lhrs_offset;
             pointObj.snapped_distance=result.snapping_distance;
+            pointObj.clrs_route = result.clrs_route;
+            pointObj.clrs_distance = result.clrs_measurement;
+            pointObj.smartcl_twp = result.smartcl_twp;
+            pointObj.smartcl_route = result.smartcl_route;
+            pointObj.smartcl_chainage = result.smartcl_chainage;
             pointObj.valid = true;
             
         }else{
@@ -560,6 +620,11 @@ class LHRS extends Component {
               pointObj.basepoint=null; 
               pointObj.offset=null;
               pointObj.snapped_distance=null;
+              pointObj.clrs_route=null;
+              pointObj.clrs_distance =null;
+              pointObj.smartcl_twp=null;
+              pointObj.smartcl_route =null;
+              pointObj.smartcl_chainage=null;
               pointObj.valid = false;
               helpers.showMessage("Not Found", "Location selected is outside the defined snapping threshold.\nPlease pick a location within the defined threshold or increase the defined threshold.", helpers.messageColors.green, 2500,true);
           }
@@ -781,7 +846,7 @@ class LHRS extends Component {
               </div>
               <div >
               <div className="sc-title sc-lhrs-title">Captured / Selected Coordinates</div>
-                <div className={((this.state.a_valid && this.state.b_valid && this.state.linearFeatureLength !==null) ? "" : " sc-hidden")}>
+                <div className={((this.state.a_valid && this.state.b_valid && this.state.linearFeatureLength !==null) ? "sc-lhrs-point-info section" : " sc-hidden")}>
                   <div className="sc-title sc-lhrs-title">Section</div>
                   <LHRSRow label="Length (km)" 
                   value={this.state.linearFeatureLength} 
@@ -799,7 +864,7 @@ class LHRS extends Component {
                     hwy={this.state.a_hwy} />
                 </div>
               
-             
+              <div className="sc-lhrs-point-info point-a">
               <div className="sc-title sc-lhrs-title">Point A</div>
               <LHRSPoint 
                   lat={this.state.a_lat}
@@ -809,9 +874,15 @@ class LHRS extends Component {
                   basepoint={this.state.a_basepoint}
                   offset={this.state.a_offset}
                   snapped_distance={this.state.a_snapped_distance}
+                  clrs_route = {this.state.a_clrs_route}
+                  clrs_distance = {this.state.a_clrs_measurement}
+                  smartcl_twp = {this.state.a_smartcl_twp}
+                  smartcl_route = {this.state.a_smartcl_route}
+                  smartcl_chainage = {this.state.a_smartcl_chainage}
               />
+              </div>
             </div>
-            <div className={(this.state.a_valid ? "" : " sc-hidden")}>
+            <div className={(this.state.a_valid ? "sc-lhrs-point-info point-b" : " sc-hidden")}>
               <div className="sc-title sc-lhrs-title">Point B</div>
               <LHRSPoint 
                 lat={this.state.b_lat}
@@ -821,6 +892,11 @@ class LHRS extends Component {
                 basepoint={this.state.b_basepoint}
                 offset={this.state.b_offset}
                 snapped_distance={this.state.b_snapped_distance}
+                clrs_route = {this.state.b_clrs_route}
+                clrs_distance = {this.state.b_clrs_measurement}
+                smartcl_twp = {this.state.b_smartcl_twp}
+                smartcl_route = {this.state.b_smartcl_route}
+                smartcl_chainage = {this.state.b_smartcl_chainage}
               />
             </div>
             

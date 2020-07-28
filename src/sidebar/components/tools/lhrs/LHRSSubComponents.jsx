@@ -6,39 +6,37 @@ export const LHRSPoint = props => {
     return (
         <div className="sc-container">
     
-        <LHRSRow label="Lat" 
-                value={props.lat} 
+        <LHRSRow label="Lat / Long" 
+                value={props.lat === null || props.long === null ? "" : props.lat + ' / ' + props.long}  
                 onChange={() => {}}
                 inputId="sc-lhrs-lat" 
                 readOnly={true}
                 placeholer={inputMsg} />
-        <LHRSRow label="Long" 
-                value={props.long} 
-                onChange={() => {}}
-                inputId="sc-lhrs-long" 
-                readOnly={true}
-                placeholer={inputMsg} />
-        <LHRSRow label="Hwy" 
-                value={props.hwy} 
-                inputId="sc-lhrs-hwy" 
-                readOnly={true}
-                placeholer={inputMsg} />
-        <LHRSRow label="M Dist. (km)" 
-                value={props.m_distance} 
-                onChange={() => {}}
-                inputId="sc-lhrs-distance" 
-                readOnly={true}
-                placeholer={inputMsg} />
-        <LHRSRow label="Basepoint" 
-                value={props.basepoint} 
+        
+        
+        
+        <LHRSRow label="LHRS - Basepoint / Offset (km)" 
+                value={props.basepoint === null || props.offset === null ? "" : props.basepoint + ' / ' + props.offset}  
                 onChange={() => {}}
                 inputId="sc-lhrs-basepoint" 
                 readOnly={true}
                 placeholer={inputMsg} />
-        <LHRSRow label="Offset (km)" 
-                value={props.offset} 
+        <LHRSRow label="LHRS - Hwy / M Dist. (km)" 
+                value={props.hwy === null || props.m_distance === null ? "" : props.hwy + ' / ' + props.m_distance}  
+                inputId="sc-lhrs-hwy" 
+                readOnly={true}
+                placeholer={inputMsg} />
+        
+        <LHRSRow label="CLRS - Route ID / M Dist. (km)" 
+                value={props.clrs_route === null || props.clrs_distance === null ? "" : props.clrs_route + ' / ' + parseFloat(props.clrs_distance).toFixed(3)}  
                 onChange={() => {}}
-                inputId="sc-lhrs-offset" 
+                inputId="sc-lhrs-clrs-route" 
+                readOnly={true}
+                placeholer={inputMsg} />
+        <LHRSRow label="Smart CL - Route ID / Twp / Chainage" 
+                value={props.smartcl_twp && props.smartcl_route && props.smartcl_chainage ? props.smartcl_route + ' / ' + props.smartcl_twp + ' / ' +props.smartcl_chainage : ""} 
+                onChange={() => {}}
+                inputId="sc-lhrs-smartcl-twp" 
                 readOnly={true}
                 placeholer={inputMsg} />
         <LHRSRow label="CL Offset (m)" 
@@ -50,11 +48,20 @@ export const LHRSPoint = props => {
     </div>);
 };
 
+export const LHRSGroupRow = props => {
+        return (
+            <div className="sc-lhrs-row sc-arrow">
+                <label>{props.label1} / {props.label2}:</label>
+                <span >{props.value1 === null ? "" : props.value1} / {props.value2 === null ? "" : props.value2}</span>
+            </div>
+        );
+};
+
 export const LHRSRow = props => {
     return (
-        <div className="sc-lhrs-row sc-arrow">
+        <div className="sc-lhrs-row sc-lhrs-info">
         <label>{props.label}:</label>
-        <span>{props.value === null ? "" : props.value}</span>
+        <span className={!props.value || props.value === "" ? "sc-hidden":"sc-arrow"}>{props.value === null ? "" : props.value}</span>
         </div>
     );
 };
@@ -66,7 +73,7 @@ export const SmartCLReportLink = props => {
 
     return (
         <div className="sc-lhrs-row sc-arrow">
-             <label>{props.label}:</label>
+             <label >{props.label}:</label>
             <span><a href={reportLink(reportConfig.report_url, reportConfig.params, props.startX,props.startY, props.endX, props.endY, props.hwy)}  rel="noopener noreferrer" target="_blank">{props.label}</a></span>
         </div>
     )

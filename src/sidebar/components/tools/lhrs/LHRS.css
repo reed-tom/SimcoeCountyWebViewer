@@ -58,13 +58,14 @@
       padding:1px;
   }
 
+  
 .sc-lhrs-table {
   display: table;
 	width: 100%;
 }
 
 .sc-lhrs-row {
-  display: table-row;
+  display: flex;
 }
 .sc-lhrs-heading {
   background-color: #EEE;
@@ -76,6 +77,48 @@
 .sc-lhrs-cell {
 	display: table-cell;
 	padding: 3px 10px;
+}
+
+.sc-lhrs-info{
+    display: block;
+}
+.sc-lhrs-info label{
+  width:100%;
+  padding-left: 0px;
+}
+.sc-lhrs-info span{
+  padding-left: 20px;
+  font-size: 12px;
+}
+.sc-lhrs-point-info {
+  border-width: 2px;
+  border-style: solid;
+  margin-top: 5px;
+}
+.sc-lhrs-point-info .sc-title{
+  margin-top:0px;
+  color:#FFF;
+}
+
+.sc-lhrs-point-info.point-a {
+  border-color:#12128F;
+}
+.sc-lhrs-point-info.point-a .sc-title{
+  background-color: #12128F;
+
+}
+.sc-lhrs-point-info.point-b {
+  border-color:#5E1010;
+}
+.sc-lhrs-point-info.point-b .sc-title{
+  background-color: #5E1010;
+}
+.sc-lhrs-point-info.section {
+  border-color:#00FFFF;
+}
+.sc-lhrs-point-info.section .sc-title{
+  background-color: #00FFFF;
+
 }
 .sc-lhrs-input {
   color: #606060;
