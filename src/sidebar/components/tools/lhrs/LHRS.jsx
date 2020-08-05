@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./LHRS.css";
 import * as helpers from "../../../../helpers/helpers";
 import PanelComponent from "../../../PanelComponent";
-import { LHRSPoint,LHRSInputRow,LHRSRow,SmartCLReportLink } from "./LHRSSubComponents.jsx";
+import { LHRSPoint,LHRSInputRow,LHRSRow,SmartCLReportLink,LHRSSelect,LHRSActions } from "./LHRSSubComponents.jsx";
 import { transform } from "ol/proj.js";
 import Select from "react-select";
 import Switch from "react-switch";
@@ -21,6 +21,8 @@ class LHRS extends Component {
     super(props);
     this._isMounted = false;
     this.state = {
+      hwySelectOptions: [],
+      hwySelectOption: undefined,
       liveWebMercatorCoords: null,
       liveLatLongCoords: null,
       inputLatLongXCoordsA: null,
@@ -285,6 +287,32 @@ class LHRS extends Component {
         break;
     }
   }
+
+  addFeatureMyMaps = (layer) => {
+    let source = undefined;
+    
+    switch (layer){
+      case 'pointA':
+        source = this.vectorLayerA.getSource()
+        break;
+      case 'pointB':
+        source = this.vectorLayerB.getSource()
+        break;
+      case 'segment':
+        source = this.vectorLayerLinear.getSource()
+        break;
+      default:
+        break;
+    }
+    
+    let features = source.getFeatures();
+    let feature = features[0];
+    let label = feature.get("label");
+    if (label === undefined ) label = "added from " + this.props.name;
+    // ADD MYMAPS
+    window.emitter.emit("addMyMapsFeature", feature, label);
+    
+  };
   updateLHRSActions = (pointObj) => {
     const optionalItem = {label:"Enter Distance from Point A", value:"enterDistanceFromA"};
     const isOptionalItem = (item)=>{
@@ -495,7 +523,9 @@ class LHRS extends Component {
                     inputBPlaceholer:inputBPlaceholer,
                     inputBHidden:inputBHidden,
                     allowMapActions:allowMapActions,
-                    selectedPoint:selectedPoint
+                    selectedPoint:selectedPoint,
+                    hwySelectOption:undefined,
+                    hwySelectOptions:[]
                     }, () => {this.allowMapActions();this.executeAction();});
       
   }
@@ -595,9 +625,9 @@ class LHRS extends Component {
                   "long":long,
                   "lat":lat
                 };
-      helpers.postJSON(mainConfig.apiUrl + "postGetLHRSByXY/", data, retResult => {
-        if (retResult.result !== undefined) {
-            var result = retResult.result;
+      helpers.postJSON(mainConfig.apiUrl + "postGetLHRSByXYMulti/", data, retResult => {
+        if (retResult.result !== undefined && retResult.result.length === 1) {
+            var result = retResult.result[0];
             pointObj.lat =  parseFloat(result.latitude_in).toFixed(7);
             pointObj.long = parseFloat(result.longitude_in).toFixed(7); 
             pointObj.hwy = result.hwy;
@@ -626,11 +656,64 @@ class LHRS extends Component {
               pointObj.smartcl_route =null;
               pointObj.smartcl_chainage=null;
               pointObj.valid = false;
-              helpers.showMessage("Not Found", "Location selected is outside the defined snapping threshold.\nPlease pick a location within the defined threshold or increase the defined threshold.", helpers.messageColors.green, 2500,true);
+
+              if (retResult.result !== undefined && retResult.result.length > 1) {
+                var results = retResult.result;
+                var items = [];
+                results.forEach(item =>{
+                    const obj = { label: item.hwy, value: item.hwy, rowValues:item };
+                    if (!items.includes(obj)){
+                      items.push(obj);
+                    }
+                });
+                this.setState({ hwySelectOptions: items, hwySelectOption: items[0] }, ()=>{
+                  helpers.showMessage("Multiple Found", "Multiple Highways detected.\nPlease choose the correct highway from the drop down.", helpers.messageColors.orange, 3500,true);
+                });
+              }else{
+                helpers.showMessage("Not Found", "Location selected is outside the defined snapping threshold.\nPlease pick a location within the defined threshold or increase the defined threshold.", helpers.messageColors.red, 2500,true);
+              }
           }
           this._setPoint(pointObj);
         });
   }
+
+  selectHwy = (selection) =>{
+    let retResult = this.state.hwySelectOptions.filter(item => item.value === selection.value)[0];
+    let pointObj = this._getPoint(this.state.selectedPoint);
+    if (retResult.rowValues !== undefined) {
+      var result = retResult.rowValues;
+      pointObj.lat = parseFloat(result.latitude_in).toFixed(7);
+      pointObj.long = parseFloat(result.longitude_in).toFixed(7); 
+      pointObj.hwy = result.hwy;
+      pointObj.m_distance = result.m_distance; 
+      pointObj.basepoint = result.basepoint; 
+      pointObj.offset = result.lhrs_offset;
+      pointObj.snapped_distance = result.snapping_distance;
+      pointObj.clrs_route = result.clrs_route;
+      pointObj.clrs_distance = result.clrs_measurement;
+      pointObj.smartcl_twp = result.smartcl_twp;
+      pointObj.smartcl_route = result.smartcl_route;
+      pointObj.smartcl_chainage = result.smartcl_chainage;
+      pointObj.valid = true;
+    }else{
+      pointObj.lat = null;
+      pointObj.long=null; 
+      pointObj.m_distance=null; 
+      pointObj.hwy=null;
+      pointObj.basepoint=null; 
+      pointObj.offset=null;
+      pointObj.snapped_distance=null;
+      pointObj.clrs_route=null;
+      pointObj.clrs_distance =null;
+      pointObj.smartcl_twp=null;
+      pointObj.smartcl_route =null;
+      pointObj.smartcl_chainage=null;
+      pointObj.valid = false;
+      helpers.showMessage("Not Found", "No LHRS Data Found.", helpers.messageColors.green, 1500, true);
+    }
+    this._setPoint(pointObj);
+  }
+
   calcLinearFeature = async (hwy,fromDistance,toDistance) => {
     let data = {
                 "version": this.state.selectLHRSVersion.value,
@@ -843,18 +926,26 @@ class LHRS extends Component {
                       hidden={this.state.inputBHidden}
                       readOnly={this.state.inputBReadOnly}
                       placeholer={this.state.inputBPlaceholer} />
+                <LHRSSelect label="Select Hwy"
+                      options={this.state.hwySelectOptions}
+                      onChange={selection => this.selectHwy(selection)}
+                      inputId={"sc-lhrs-hwy-select"} 
+                      hidden={(this.state.hwySelectOptions.length < 2)}
+                     
+                      />
               </div>
               <div >
               <div className="sc-title sc-lhrs-title">Captured / Selected Coordinates</div>
                 <div className={((this.state.a_valid && this.state.b_valid && this.state.linearFeatureLength !==null) ? "sc-lhrs-point-info section" : " sc-hidden")}>
                   <div className="sc-title sc-lhrs-title">Section</div>
+                  <LHRSActions onAddToMyMap={() => {this.addFeatureMyMaps('segment');}} /> 
                   <LHRSRow label="Length (km)" 
                   value={this.state.linearFeatureLength} 
                   onChange={() => {}}
                   inputId="sc-lhrs-section-length" 
                   readOnly={true}
                   placeholer="" />
-
+                  
                   <SmartCLReportLink 
                     label="Smart CL - Segment Report" 
                     startX={this.state.inputLatLongXCoordsA} 

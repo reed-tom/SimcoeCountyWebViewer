@@ -162,10 +162,15 @@
 }
 .sc-float-right{
   text-align: right;
+  display: block;
 }
 
 .sc-lhrs-center{
   text-align: center;
+}
+
+.sc-lhrs-select {
+  width:170px;
 }
 
 #sc-lhrs-action-select {

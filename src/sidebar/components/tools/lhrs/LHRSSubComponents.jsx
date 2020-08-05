@@ -1,4 +1,5 @@
 import React from "react";
+import Select from "react-select";
 import localConfig from "./config.json";
 
 export const LHRSPoint = props => {
@@ -39,12 +40,7 @@ export const LHRSPoint = props => {
                 inputId="sc-lhrs-smartcl-twp" 
                 readOnly={true}
                 placeholer={inputMsg} />
-        <LHRSRow label="CL Offset (m)" 
-                value={props.snapped_distance} 
-                onChange={() => {}}
-                inputId="sc-lhrs-snapped" 
-                readOnly={true}
-                placeholer={inputMsg} />
+       
     </div>);
 };
 
@@ -65,7 +61,14 @@ export const LHRSRow = props => {
         </div>
     );
 };
-
+export const LHRSActions = props => {
+    return (
+      <div className="sc-lhrs-row sc-float-right">
+        [&nbsp;<span className="sc-fakeLink" onClick={props.onAddToMyMap}>add to my map</span>&nbsp;]
+      </div>
+    );
+  };
+  
 export const SmartCLReportLink = props => {
     const reportConfig = localConfig.smartcl;
     const reportLink = (url, params, startX, startY, endX, endY, hwy) => `${url}?${params.startX}=${startX}&${params.startY}=${startY}&${params.endX}=${endX}&${params.endY}=${endY}&${params.hwy}=${hwy}`
@@ -99,6 +102,29 @@ export const LHRSInputRow = props => {
                 if (evt.key === "Enter") props.onEnterKey();
               }}
             />
+        </span>
+        </div>
+    );
+};
+
+export const LHRSSelect = props => {
+    return (
+        <div className={"sc-lhrs-row sc-arrow" + (props.hidden ? " sc-hidden" : "")}>
+        <label>{props.label}:</label>
+        <span> 
+        <Select 
+            id={props.inputId}
+            onChange={props.onChange}
+            options={props.options} 
+            value={props.value}
+            onFocus={props.onFocus}
+            onBlur={props.onBlur} 
+            className="sc-lhrs-select"
+            onKeyDown={evt => {
+                if (evt.key === "Enter") props.onEnterKey();
+              }}
+        />
+            
         </span>
         </div>
     );
