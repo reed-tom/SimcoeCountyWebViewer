@@ -941,7 +941,7 @@ export function updateLayerIndex(layers, callback) {
 }
 
 export function getLayerInfo(layerInfo, callback) {
-  if (layerInfo.metadataUrl !== undefined && layerInfo.metadataUrl !== null) return;
+  if (layerInfo.metadataUrl === undefined || layerInfo.metadataUrl === null) return;
   helpers.getJSON(layerInfo.metadataUrl.replace("http:", "https:"), result => {
     const fullInfoUrl = result.layer.resource.href.replace("http:", "https:").split("+").join("%20");
     helpers.getJSON(fullInfoUrl, result => {
