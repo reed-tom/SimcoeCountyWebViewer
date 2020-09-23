@@ -24,14 +24,12 @@
 #sc-basemap-options {
   position: absolute;
   left: auto;
-  right: 5px;
-  top: auto;
-  bottom: 14px;
-  width: 20px;
-  height: 14px;
+  right: -2px;
+  top: 2px;
+  bottom: auto;
+  width: 5px;
+  height: 20px;
   padding: 4px;
-  background: #6ea8cf;
-  border-radius: 5px;
   cursor: pointer;
   background-image: url(./images/more-options.png);
   background-repeat: no-repeat;
