@@ -8,14 +8,14 @@ import { Group as LayerGroup } from "ol/layer.js";
 import xml2js from "xml2js";
 import { Vector as VectorSource } from "ol/source.js";
 import { Vector as VectorLayer } from "ol/layer.js";
-import FloatingMenu from "../helpers/FloatingMenu.jsx";
+import FloatingMenu, { FloatingMenuItem }from "../helpers/FloatingMenu.jsx";
 import Portal from "../helpers/Portal.jsx";
 import { Item as MenuItem } from "rc-menu";
 
 class BasemapSwitcher extends Component {
   constructor(props) {
     super(props);
-
+    this.storageKeyBasemap = "Saved Basemap Options";
     this.state = {
       topoPanelOpen: false,
       topoLayers: [],
@@ -36,7 +36,6 @@ class BasemapSwitcher extends Component {
   }
   componentDidMount(){
     this.setState({showBaseMapSwitcher:window.mapControls.basemap,toggleService:BasemapConfig.topoServices[1]});
-   
   }
   onMapLoad() {
     let index = 0;
@@ -116,7 +115,20 @@ class BasemapSwitcher extends Component {
       }
     });
 
-    this.setState({ topoLayers: basemapList, topoActiveIndex: 0, previousIndex:0});
+    this.setState({ topoLayers: basemapList, topoActiveIndex: 0, previousIndex:0},()=>{
+      let savedOptions = helpers.getItemsFromStorage(this.storageKeyBasemap);
+      if (savedOptions !== undefined){
+          this.setState({
+            topoActiveIndex: savedOptions.toggleIndex,
+            basemapOpacity:savedOptions.basemapOpacity,
+            toggleIndex:savedOptions.topoActiveIndex, 
+            previousIndex:savedOptions.previousIndex,
+        },()=>{
+          this.onToggleBasemap(this.state.toggleIndex);
+        });
+      }
+    });
+      
     
     // NEED TO WAIT A TAD FOR LAYERS TO INIT
     setTimeout(() => {
@@ -222,7 +234,27 @@ class BasemapSwitcher extends Component {
       
     });
   }
-
+  saveBasemap(){
+    let basemapOptions = {
+      topoActiveIndex: this.state.topoActiveIndex,
+      basemapOpacity:this.state.basemapOpacity,
+      toggleService:this.state.toggleService,
+      toggleIndex:this.state.toggleIndex, 
+      previousIndex: this.state.previousIndex,
+    }
+    helpers.saveToStorage(this.storageKeyBasemap, basemapOptions);
+    helpers.showMessage("Save", "Basemap options saved.");
+  }
+  onMenuItemClick = action => {
+    switch(action){
+      case "sc-floating-menu-save-basemap":
+        this.saveBasemap();
+        break;
+      default:
+        break;
+    }
+    helpers.addAppStat("Basemap Settings - ", action);
+  };
     // ELLIPSIS/OPTIONS BUTTON
     onBasemapOptionsClick = (evt) => {
       var evtClone = Object.assign({}, evt);
@@ -234,9 +266,12 @@ class BasemapSwitcher extends Component {
             autoY={false}
             title="Basemap Options"
             item={this.props.info}
-            onMenuItemClick={()=>{}}
+            onMenuItemClick={action => this.onMenuItemClick(action)}
             styleMode={"left"}
           >
+          <MenuItem className="sc-floating-menu-toolbox-menu-item" key="sc-floating-menu-save-basemap">
+            <FloatingMenuItem imageName={"save-disk.png"} label="Save Default Basemap" />
+          </MenuItem>
             <MenuItem className="sc-layers-slider" key="sc-floating-menu-opacity">
               Adjust Transparency
               <Slider max={1} min={0} step={0.05} defaultValue={this.state.basemapOpacity} onChange={evt => this.onSliderChange(evt)} />
