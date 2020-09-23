@@ -143,8 +143,16 @@ class LHRS extends Component {
     this.onMapMoveEvent = window.map.on("moveend", this.onMapMoveEnd);
     this._getLHRSVersions();
     this._getLHRSActions();
-
+    
     if (this._isMounted) this.forceUpdate();
+
+    if (this.props.params !== undefined){
+      setTimeout(() => {
+        const webMercatorCoords = this.props.params;
+        this.updateCoordinates(webMercatorCoords);
+        this.createPoint(webMercatorCoords, false);
+      }, 500);      
+    }
   }
 
   _getLHRSVersions = () => {

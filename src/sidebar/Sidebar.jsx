@@ -167,8 +167,8 @@ class Sidebar extends Component {
     
 
     // LISTEN FOR ITEM ACTIVATION FROM OTHER COMPONENTS
-    window.emitter.addListener("activateSidebarItem", (name, type) => {
-      this.activateItemFromEmmiter(name, type);
+    window.emitter.addListener("activateSidebarItem", (name, type, params=undefined) => {
+      this.activateItemFromEmmiter(name, type,params);
     });
     window.emitter.emit("sidebarLoaded");  
   }
@@ -213,7 +213,7 @@ class Sidebar extends Component {
     this.activateTab("reports");
   };
 
-  activateItemFromEmmiter(name, type) {
+  activateItemFromEmmiter(name, type, params=undefined) {
     const active = this.state.activeTabComponents;
     if (type === "tools") {
       //SAME TOOL WAS SELECTED
@@ -221,7 +221,7 @@ class Sidebar extends Component {
         this.activateTab("tools");
         return;
       }
-
+      this.onMyMapsEditing(true);
       this.setState({ tabIndex: 1 }, () => {
         //CLEAR LOADED TOOL
         let activeTabComponents = this.state.activeTabComponents;
@@ -232,7 +232,7 @@ class Sidebar extends Component {
         window.emitter.emit("closeToolsOrThemes", type);
 
         // ACTIVATE THE NEW ITEM
-        this.activateSidebarItem(name, type);
+        this.activateSidebarItem(name, type, params);
       });
     } else if (type === "mymaps") {
       this.activateTab("mymaps");
@@ -292,7 +292,7 @@ class Sidebar extends Component {
   }
 
   // TOOL AND THEME ITEMS CLICK
-  activateSidebarItem(name, type) {
+  activateSidebarItem(name, type, params=undefined) {
     // THIS HANDLES WHAT TOOL/THEME IS LOADED IN THE SIDEBAR
     if (type === "tools") {
       var loadedTool = this.state.activeTabComponents.tools.loadedComponent;
@@ -303,7 +303,7 @@ class Sidebar extends Component {
           if (Component.props.name === name) {
             // CREATE TOOL COMPONENT
             var comp = (
-              <Component key={helpers.getUID()} name={Component.props.name} onClose={this.onPanelComponentClose} onSidebarVisibility={this.togglePanelVisibility} config={Component.props.config} />
+              <Component key={helpers.getUID()} name={Component.props.name} onClose={this.onPanelComponentClose} onSidebarVisibility={this.togglePanelVisibility} config={Component.props.config} params={params} />
             );
             let activeTabComponents = this.state.activeTabComponents;
             activeTabComponents.tools.loadedComponent = comp;
