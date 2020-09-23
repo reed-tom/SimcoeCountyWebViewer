@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import ReactDOM from "react-dom";
+import Slider from "rc-slider";
 import "./BasicBasemapSwitcher.css";
 import * as helpers from "../helpers/helpers";
 import BasemapConfig from "./basemapSwitcherConfig.json";
@@ -6,6 +8,9 @@ import { Group as LayerGroup } from "ol/layer.js";
 import xml2js from "xml2js";
 import { Vector as VectorSource } from "ol/source.js";
 import { Vector as VectorLayer } from "ol/layer.js";
+import FloatingMenu from "../helpers/FloatingMenu.jsx";
+import Portal from "../helpers/Portal.jsx";
+import { Item as MenuItem } from "rc-menu";
 
 class BasemapSwitcher extends Component {
   constructor(props) {
@@ -16,6 +21,7 @@ class BasemapSwitcher extends Component {
       topoLayers: [],
       topoActiveIndex: 0,
       topoCheckbox: true,
+      basemapOpacity:1,
       activeButton: "topo",
       toggleService:undefined,
       toggleIndex:1, 
@@ -185,13 +191,20 @@ class BasemapSwitcher extends Component {
           if (layer.get("isOverlay") && this.state.topoCheckbox) layer.setVisible(true);
           else if (layer.get("isOverlay") && !this.state.topoCheckbox) layer.setVisible(false);
         });
-
+        layer.setOpacity(this.state.basemapOpacity);
         layer.setVisible(true);
       } else {
+        layer.setOpacity(this.state.basemapOpacity);
         layer.setVisible(false);
       }
     }
   }
+  // OPACITY SLIDER FOR EACH LAYER
+  onSliderChange = (opacity) => {
+    this.setState({basemapOpacity: opacity}, () =>{
+      this.setTopoLayerVisiblity(this.state.topoActiveIndex);
+    });
+  };
 
   onToggleBasemap = (index) =>{
     if (index === this.state.topoActiveIndex){
@@ -209,6 +222,31 @@ class BasemapSwitcher extends Component {
       
     });
   }
+
+    // ELLIPSIS/OPTIONS BUTTON
+    onBasemapOptionsClick = (evt) => {
+      var evtClone = Object.assign({}, evt);
+      const menu = (
+        <Portal>
+          <FloatingMenu
+            key={helpers.getUID()}
+            buttonEvent={evtClone}
+            autoY={false}
+            title="Basemap Options"
+            item={this.props.info}
+            onMenuItemClick={()=>{}}
+            styleMode={"left"}
+          >
+            <MenuItem className="sc-layers-slider" key="sc-floating-menu-opacity">
+              Adjust Transparency
+              <Slider max={1} min={0} step={0.05} defaultValue={this.state.basemapOpacity} onChange={evt => this.onSliderChange(evt)} />
+            </MenuItem>
+          </FloatingMenu>
+        </Portal>
+      );
+  
+      ReactDOM.render(menu, document.getElementById("portal-root"));
+    };
   controlStateChange(control, state) {
     switch (control){
       case "basemap":
@@ -222,7 +260,7 @@ class BasemapSwitcher extends Component {
     return (
       <div className={(!this.state.showBaseMapSwitcher? " sc-hidden":"")}>
         <div id="sc-basemap-main-container">
-          
+          <div id="sc-basemap-options" onClick={this.onBasemapOptionsClick} title="Basemap Options" alt="Basemap Options"></div>
           <div className={"sc-basemap-topo"}>
             <BasemapItem key={helpers.getUID()} className="sc-basemap-topo-toggle-item-container" index={this.state.toggleIndex} showLabel={true} topoActiveIndex={this.state.topoActiveIndex} service={this.state.toggleService} onTopoItemClick={this.onToggleBasemap} />
             <button className={"sc-button sc-basemap-arrow" + (this.state.topoPanelOpen ? " open" : "")} onClick={this.onTopoArrowClick}></button>

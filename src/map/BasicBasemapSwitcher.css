@@ -21,6 +21,28 @@
   opacity: 1;
 }
 
+#sc-basemap-options {
+  position: absolute;
+  left: auto;
+  right: 5px;
+  top: auto;
+  bottom: 14px;
+  width: 20px;
+  height: 14px;
+  padding: 4px;
+  background: #6ea8cf;
+  border-radius: 5px;
+  cursor: pointer;
+  background-image: url(./images/more-options.png);
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-position-y: center;
+  opacity: 0.5;
+}
+#sc-basemap-options:hover {
+  opacity: 1;
+}
+
 .sc-basemap-collapse-button {
   display: table-cell;
   background-image: url(./images/tab-close.png);
