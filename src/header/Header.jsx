@@ -87,10 +87,15 @@ class Header extends Component {
           <Search />
         </div>
         <div className="sc-header-feedback-container" >
-          
+          <div className="sc-header-help-container" >
+              <div className="sc-header-help-btn" onClick={() => helpers.showURLWindow(mainConfig.helpUrl, false, "full")}>?</div>
+          </div>
         </div>
-        {/* <div className="sc-header-dot-menu-container" onClick={this.onDotMenuClick}><img className="sc-header-dot-menu-img" src={images['vertical-dot-menu.png']} alt="dots"></img></div> */}
-      </div>
+        
+{/*
+        <div className="sc-header-dot-menu-container" onClick={this.onDotMenuClick}><img className="sc-header-dot-menu-img" src={images['vertical-dot-menu.png']} alt="dots"></img></div>
+*/}
+        </div>
     );
   }
 }
@@ -98,3 +103,10 @@ class Header extends Component {
 export default Header;
 
 
+// IMPORT ALL IMAGES
+const images = importAllImages(require.context('./images', false, /\.(png|jpe?g|svg)$/));
+function importAllImages(r) {
+    let images = {};
+    r.keys().map((item, index) => images[item.replace('./', '')] = r(item));
+    return images;
+  }
