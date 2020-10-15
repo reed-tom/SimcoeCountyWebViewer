@@ -49,7 +49,7 @@ class MyMapsSymbolizer extends Component {
       strokeColor = this.props.item.style.image_.stroke_.color_;
       strokeWidth = this.props.item.style.image_.stroke_.width_;
     } else {
-      if (this.props.item.style !== null) {
+      if (this.props.item.style !== null && this.props.item.style.stroke_ !== null) {
         strokeColor = this.props.item.style.stroke_.color_;
         strokeWidth = this.props.item.style.stroke_.width_;
       }

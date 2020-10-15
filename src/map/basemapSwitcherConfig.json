@@ -32,7 +32,7 @@
       "index": 2,
       "layers": [
         {
-          "url": "https://intra.ws.giscache.lrc.gov.on.ca/arcgis/rest/services/LIO_Cartographic/LIO_Topographic/MapServer",
+          "url": "https://ws.lioservices.lrc.gov.on.ca/arcgis1061a/rest/services/LIO_Cartographic/LIO_Topographic/MapServer",
           "type": "ESRI_TILED"
         }
       ]
