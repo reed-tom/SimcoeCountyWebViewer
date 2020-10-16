@@ -119,7 +119,7 @@ class TOC extends Component {
     if (mainConfig.leftClickIdentify) {
       window.map.on("singleclick", evt => {
         // DISABLE IDENTIFY CLICK
-        let disable = window.disableIdentifyClick;
+        let disable = window.disableIdentifyClick || window.popupActive;
         if (disable) return;
         // DISABLE POPUPS
         disable = window.isDrawingOrEditing;

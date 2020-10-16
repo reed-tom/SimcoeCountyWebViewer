@@ -221,7 +221,6 @@ class Sidebar extends Component {
         this.activateTab("tools");
         return;
       }
-      this.onMyMapsEditing(true);
       this.setState({ tabIndex: 1 }, () => {
         //CLEAR LOADED TOOL
         let activeTabComponents = this.state.activeTabComponents;

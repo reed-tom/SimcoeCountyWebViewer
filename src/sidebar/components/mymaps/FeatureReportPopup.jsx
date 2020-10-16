@@ -12,9 +12,10 @@ class FeatureReportPopup extends Component {
   state = {
     reportOption:undefined,
     reportOptions:undefined,
-    buffer: 0,
     reports: undefined,
-    isLoading:false
+    isLoading:false,
+    bufferOption: {label:"None", value:0},
+    bufferOptions: [{label:"None", value:0},{label:"50 Meters", value:50},{label:"100 Meters", value:100}]
   };
 
   componentDidMount() {
@@ -66,22 +67,19 @@ class FeatureReportPopup extends Component {
       <div className="sc-mymaps-popup-container">
         <LoadingScreen key={helpers.getUID()} visible={this.state.isLoading} spinnerSize={60} /> 
         Report:
-        <Select name="availableReports"  options={this.state.reportOptions} value={this.state.reportOption} onChange={(evt) => {this.setState({report:evt.target.value});} } />
+        <Select key={helpers.getUID()} name="availableReports"  options={this.state.reportOptions} value={this.state.reportOption} onChange={(selection) => {this.setState({report:selection});} } />
          <br />
         Buffer:
-        <select name="featureBuffer" value={this.state.buffer} onChange={(evt) => {this.setState({buffer:evt.target.value});} }>
-          <option value="0">None</option>
-          <option value="50">50 Meters</option>
-          <option value="100">100 Meters</option>
-        </select>
+        <Select key={helpers.getUID()} name="featureBuffer" options={this.state.bufferOptions} value={this.state.bufferOption} onChange={(selection) => {this.setState({bufferOption:selection});} } />
+        <br />
         <FooterButtons
           onPreviewReport={() => {
                                   this.setState({isLoading:true});
-                                  this.onPreviewReport(this.state.reportOption.value, this.state.buffer);
+                                  this.onPreviewReport(this.state.reportOption.value, this.state.bufferOption.value);
                                 }}
           onGenerateReport={() => {
                                 this.setState({isLoading:true});
-                                this.onGenerateReport(this.state.reportOption.value, this.state.buffer);
+                                this.onGenerateReport(this.state.reportOption.value, this.state.bufferOption.value);
                               }}
         />
       </div>
@@ -109,6 +107,7 @@ function FooterButtons(props) {
       <button className="sc-button sc-mymaps-popup-footer-button" key={helpers.getUID()} id={helpers.getUID()} onClick={props.onGenerateReport}>
         Generate Excel Report
       </button>
+      <br />
       <button
         className="sc-button sc-mymaps-popup-footer-button"
         key={helpers.getUID()}

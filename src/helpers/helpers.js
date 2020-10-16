@@ -941,7 +941,7 @@ export function previewReport(feature, report, buffer=0, callback){
   let geom = feature.getGeometry();
   //const utmNad83Geometry = geom.transform("EPSG:3857", _nad83Proj);
   const geoJSON = getGeoJSONFromGeometry(geom);
-  const obj = { geoJSON: geoJSON, srid: "3857", buffer:0 };
+  const obj = { geoJSON: geoJSON, srid: "3857", buffer:buffer };
   return fetch(url, {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
     mode: "cors", // no-cors, cors, *same-origin

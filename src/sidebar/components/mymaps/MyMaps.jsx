@@ -96,7 +96,7 @@ class MyMaps extends Component {
     if (existingLayer === undefined) window.map.addLayer(this.vectorLayer);
 
     window.map.on("singleclick", evt => {
-      if (this.draw !== null || this.state.isEditing) return;
+      if (this.draw !== null || this.state.isEditing || window.popupActive) return;
 
       window.map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
         if (layer === null) return;
