@@ -11,7 +11,9 @@ class Navigation extends Component {
     this.state = {
       containerClassName: "nav-container",
       showCurrentLocation:true,
-      showZoomExtent:true
+      showZoomExtent:true,
+      showIdentifyFeature:true,
+      identifyFeature:false
     };
 
     // LISTEN FOR SIDEPANEL CHANGES
@@ -48,7 +50,21 @@ class Navigation extends Component {
     }
     window.map.getView().animate({ center: centerCoords, zoom: defaultZoom });
   }
-
+  // TOGGLE IDENTIFY
+  toggleIdentify() {
+    // DISABLE PARCEL CLICK
+    window.disableParcelClick = !window.disableParcelClick;
+    // DISABLE IDENTIFY CLICK
+    window.disableIdentifyClick = !window.disableIdentifyClick;
+    // DISABLE POPUPS
+    window.isDrawingOrEditing = !window.isDrawingOrEditing;
+    if (window.isDrawingOrEditing){
+      window.emitter.emit("changeCursor","standard");
+    }else{
+      window.emitter.emit("changeCursor","identify");
+    }
+    helpers.addAppStat("Toggle Identify", "Click");
+  }
   // ZOOM TO CURRENT LOCATION
   zoomToCurrentLocation() {
     var options = { timeout: 5000 };
@@ -96,12 +112,15 @@ class Navigation extends Component {
         </div>
         <div className="zoomButton" onClick={this.zoomOut}>
           -
-    </div>*/}
-        <div className={"fullExtentButton" + (!this.state.showZoomExtent? " sc-hidden":"")} onClick={this.zoomFullExtent}>
+        </div>*/}
+        <div className={"fullExtentButton" + (!this.state.showZoomExtent? " sc-hidden":"")} onClick={this.zoomFullExtent} title="Reset Zoom" alt="Reset Zoom">
           <div className="fullExtentContent"></div>
         </div>
-        <div className={"zoomToCurrentLocationButton" + (!this.state.showCurrentLocation? " sc-hidden":"")} onClick={this.zoomToCurrentLocation}>
+        <div className={"zoomToCurrentLocationButton" + (!this.state.showCurrentLocation? " sc-hidden":"")} onClick={this.zoomToCurrentLocation} title="Current Location" alt="Current Location">
           <div className="zoomToCurrentLocationContent"></div>
+        </div>
+        <div className={"identifyToggleButton" + (!this.state.showIdentifyFeature? " sc-hidden":"") + (!window.isDrawingOrEditing? " toggleOn":"")} onClick={this.toggleIdentify} title="Toggle Identify" alt="Toggle Identify">
+          <div className="identifyToggleContent"></div>
         </div>
       </div>
     );

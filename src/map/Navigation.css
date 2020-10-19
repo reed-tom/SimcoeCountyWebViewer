@@ -80,6 +80,35 @@
   background-position: center center;
 }
 
+
+
+.identifyToggleButton {
+  margin-top: 5px;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%);
+  border-radius: 100px;
+  box-shadow: 0px 0px 5px 0px rgba(80, 80, 80, 0.69);
+  background-position: center center;
+}
+
+.identifyToggleContent {
+width: 30px;
+height: 30px;
+background-image: url(./images/identify_cursor.png);
+background-color: transparent !important;
+background-repeat: no-repeat;
+background-repeat: no-repeat;
+border-radius: 100px;
+box-shadow: 0px 0px 5px 0px rgba(80, 80, 80, 0.69);
+background-position: center center;
+}
+.toggleOn {
+  
+  box-shadow: inset 0px 0px 5px 0px rgba(80, 80, 80, 0.69);
+
+}
+
 @media only screen and (max-width: 770px) {
   .nav-container {
     top: 61px;
