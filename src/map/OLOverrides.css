@@ -66,6 +66,13 @@
   overflow: hidden;
 }
 
+.ol-rotate-reset:hover,
+.ol-zoom-in:hover,
+.ol-zoom-out:hover {
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(200, 200, 200, 1) 100%);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(200, 200, 200, 1) 100%);
+}
+
 .ol-scale-line {
   right: 5px;
   left: auto !important;

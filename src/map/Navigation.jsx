@@ -13,7 +13,8 @@ class Navigation extends Component {
       showCurrentLocation:true,
       showZoomExtent:true,
       showIdentifyFeature:true,
-      identifyFeature:false
+      identifyFeature:false,
+      showMeasureButton:true
     };
 
     // LISTEN FOR SIDEPANEL CHANGES
@@ -38,6 +39,11 @@ class Navigation extends Component {
     window.map.getView().setZoom(window.map.getView().getZoom() - 1);
   }
   */
+   // OPEN MEASUREMENT PANEL
+  openMeasurementPanel() {
+    window.emitter.emit("activateTab", "tools");
+    window.emitter.emit("activateSidebarItem", "Measure", "tools");
+  }
   // ZOOM TO FULL EXTENT
   zoomFullExtent() {
     let centerCoords = mainConfig.centerCoords;
@@ -113,14 +119,17 @@ class Navigation extends Component {
         <div className="zoomButton" onClick={this.zoomOut}>
           -
         </div>*/}
-        <div className={"fullExtentButton" + (!this.state.showZoomExtent? " sc-hidden":"")} onClick={this.zoomFullExtent} title="Reset Zoom" alt="Reset Zoom">
-          <div className="fullExtentContent"></div>
+        <div className={"navigationButton" + (!this.state.showZoomExtent? " sc-hidden":"")} onClick={this.zoomFullExtent} title="Reset Zoom" alt="Reset Zoom">
+          <div className="navigationContent fullExtentContent"></div>
         </div>
-        <div className={"zoomToCurrentLocationButton" + (!this.state.showCurrentLocation? " sc-hidden":"")} onClick={this.zoomToCurrentLocation} title="Current Location" alt="Current Location">
-          <div className="zoomToCurrentLocationContent"></div>
+        <div className={"navigationButton" + (!this.state.showCurrentLocation? " sc-hidden":"")} onClick={this.zoomToCurrentLocation} title="Current Location" alt="Current Location">
+          <div className="navigationContent zoomToCurrentLocationContent"></div>
         </div>
-        <div className={"identifyToggleButton" + (!this.state.showIdentifyFeature? " sc-hidden":"") + (!window.isDrawingOrEditing? " toggleOn":"")} onClick={this.toggleIdentify} title="Toggle Identify" alt="Toggle Identify">
-          <div className="identifyToggleContent"></div>
+        <div className={"navigationButton" + (!this.state.showIdentifyFeature? " sc-hidden":"") + (!window.isDrawingOrEditing? " toggleOn":"")} onClick={this.toggleIdentify} title="Toggle Identify" alt="Toggle Identify">
+          <div className="navigationContent identifyToggleContent"></div>
+        </div>
+        <div className={"navigationButton" + (!this.state.showMeasureButton? " sc-hidden":"")} onClick={this.openMeasurementPanel} title="Open Measurement Panel" alt="Open Measurement Panel">
+          <div className="navigationContent measureContent"></div>
         </div>
       </div>
     );

@@ -37,52 +37,11 @@
   display:none;
 }
 
-.fullExtentButton {
-  width: 30px;
-  height: 30px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(229, 229, 229, 1) 100%);
-  border-radius: 100px;
-  box-shadow: 0px 0px 5px 0px rgba(80, 80, 80, 0.69);
-  background-position: center center;
-}
-
-.fullExtentContent {
-  width: 30px;
-  height: 30px;
-  background-image: url(./images/globe-icon.png);
-  background-color: transparent !important;
-  background-repeat: no-repeat;
-  background-repeat: no-repeat;
-  border-radius: 100px;
-  box-shadow: 0px 0px 5px 0px rgba(80, 80, 80, 0.69);
-  background-position: center center;
-}
-
-.zoomToCurrentLocationButton {
-    margin-top: 5px;
-    width: 30px;
-    height: 30px;
-    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%);
-    border-radius: 100px;
-    box-shadow: 0px 0px 5px 0px rgba(80, 80, 80, 0.69);
-    background-position: center center;
-}
-
-.zoomToCurrentLocationContent {
-  width: 30px;
-  height: 30px;
-  background-image: url(./images/target.png);
-  background-color: transparent !important;
-  background-repeat: no-repeat;
-  background-repeat: no-repeat;
-  border-radius: 100px;
-  box-shadow: 0px 0px 5px 0px rgba(80, 80, 80, 0.69);
-  background-position: center center;
-}
 
 
 
-.identifyToggleButton {
+
+.navigationButton {
   margin-top: 5px;
   width: 30px;
   height: 30px;
@@ -92,21 +51,35 @@
   background-position: center center;
 }
 
-.identifyToggleContent {
+.navigationContent {
 width: 30px;
 height: 30px;
-background-image: url(./images/identify_cursor.png);
 background-color: transparent !important;
-background-repeat: no-repeat;
 background-repeat: no-repeat;
 border-radius: 100px;
 box-shadow: 0px 0px 5px 0px rgba(80, 80, 80, 0.69);
 background-position: center center;
 }
+.navigationButton:hover{
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(200, 200, 200, 1) 100%) !important;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(200, 200, 200, 1) 100%) !important;
+}
+.fullExtentContent {
+  background-image: url(./images/globe-icon.png);
+}
+.zoomToCurrentLocationContent {
+  background-image: url(./images/target.png);
+}
+.measureContent {
+  background-image: url(./images/measure.png);
+}
+.identifyToggleContent {
+  background-image: url(./images/identify_cursor.png);
+}
 .toggleOn {
-  
-  box-shadow: inset 0px 0px 5px 0px rgba(80, 80, 80, 0.69);
-
+  box-shadow: inset 0px 0px 5px 0px rgba(100, 100, 100, 1);
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(210, 210, 210, 1) 100%) !important;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(210, 210, 210, 1) 100%) !important;
 }
 
 @media only screen and (max-width: 770px) {
