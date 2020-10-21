@@ -76,6 +76,8 @@ class Search extends Component {
     window.emitter.addListener("searchHistorySelect", (item) => this.onHistoryItemSelect(item));
     // LISTEN FOR MAP TO MOUNT
     window.emitter.addListener("mapLoaded", () => this.onMapLoad());
+    window.emitter.addListener("tocLoaded", () => this.onInitialSearch()); 
+
 this._isMounted = false;
     this.state = {
       value: "",
@@ -85,7 +87,8 @@ this._isMounted = false;
       iconActiveClass: "sc-search-icon-active-hidden",
       showMore: false,
       searchTypes: [],
-      selectedType: ""
+      selectedType: "",
+      loadCount: 0
     };
   }
 
@@ -105,7 +108,8 @@ this._isMounted = false;
         helpers.getJSON(searchInfoURL(apiUrl, locationId), result => this.jsonCallback(result));
       }, 500);
     }
-  };
+  }
+
 
   componentDidMount() {
     helpers.getJSON(searchTypesURL(apiUrl), result => {
@@ -118,8 +122,8 @@ this._isMounted = false;
       items.push({ label: "Open Street Map", value: "Open Street Map" });
       items.push({ label: "Map Layer", value: "Map Layer" });
       items.push({ label: "Tool", value: "Tool" });
-     
-      this.setState({ searchTypes: items, selectedType: items[0] });
+      let selectedType = this.state.selectedType === "" ? items[0] :this.state.selectedType;
+      this.setState({ searchTypes: items, selectedType: selectedType });
     });
 
     // PATCH TO CLOSE MENU WHEN MAP IS CLICKED
@@ -139,7 +143,23 @@ this._isMounted = false;
       true
     );
   }
-
+  onInitialSearch = () => {
+    // GET SEARCH URL PARAMETERS
+    const search = helpers.getURLParameter("q");
+    let search_type = helpers.getURLParameter("qt");
+    if (!search) return;
+    if (!search_type){
+      search_type = "All";
+    }
+    this.setState({value:search, selectedType: { label: search_type, value: search_type } });
+    helpers.getJSON(encodeURI(searchURL(apiUrl, search, search_type, 1)), responseJson => { 
+      if(responseJson[0] !== undefined 
+          && responseJson[0].id !== null 
+          && responseJson[0].id !== undefined) {
+        helpers.getJSON(searchInfoURL(apiUrl, responseJson[0].id), result => this.jsonCallback(result));
+      }
+    });
+  }
   onTypeDropDownChange = selectedType => {
     this.setState({ selectedType: selectedType }, async () => {
       let limit = defaultSearchLimit;
