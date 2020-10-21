@@ -41,7 +41,7 @@ class FeatureReportPopup extends Component {
   onPreviewReport(report, buffer){
     let selectedReport = this.getSelectedReport(report);
     helpers.previewReport(drawingHelpers.getFeatureById(this.props.item.id), selectedReport.preview, buffer, (summaryData) =>{
-      if (summaryData === undefined || summaryData.length === 0) {
+      if (summaryData === undefined || summaryData === null || summaryData.length === 0) {
         helpers.showMessage("Not Found", "There were no results for the current selection");
       }else{
         window.emitter.emit("loadReport", <SummaryReport summary={summaryData} />);
@@ -67,7 +67,7 @@ class FeatureReportPopup extends Component {
       <div className="sc-mymaps-popup-container">
         <LoadingScreen key={helpers.getUID()} visible={this.state.isLoading} spinnerSize={60} /> 
         Report:
-        <Select key={helpers.getUID()} name="availableReports"  options={this.state.reportOptions} value={this.state.reportOption} onChange={(selection) => {this.setState({report:selection});} } />
+        <Select key={helpers.getUID()} name="availableReports"  options={this.state.reportOptions} value={this.state.reportOption} onChange={(selection) => {this.setState({reportOption:selection});} } />
          <br />
         Buffer:
         <Select key={helpers.getUID()} name="featureBuffer" options={this.state.bufferOptions} value={this.state.bufferOption} onChange={(selection) => {this.setState({bufferOption:selection});} } />
