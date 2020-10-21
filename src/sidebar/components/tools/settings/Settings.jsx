@@ -15,7 +15,9 @@ class Settings extends Component {
       controlZoomExtent:true,
       controlScale:true,
       controlScaleLine:true,
-      controlBasemap:true
+      controlBasemap:true,
+      controlMeasureShortcut:true,
+      controlIdentifyToggle:true
     };
     this.storageKey = "Settings";
     this.storageKeyMapControls = "Map Control Settings";
@@ -34,7 +36,9 @@ class Settings extends Component {
       controlZoomExtent:window.mapControls.zoomExtent,
       controlScale:window.mapControls.scale,
       controlScaleLine:window.mapControls.scaleLine,
-      controlBasemap:window.mapControls.basemap});
+      controlBasemap:window.mapControls.basemap,
+      controlMeasureShortcut:window.mapControls.measureShortcut,
+      controlIdentifyToggle:window.mapControls.identifyToggle});
     }
   }
 
@@ -46,7 +50,9 @@ class Settings extends Component {
       controlZoomExtent:window.mapControls.zoomExtent,
       controlScale:window.mapControls.scale,
       controlScaleLine:window.mapControls.scaleLine,
-      controlBasemap:window.mapControls.basemap});
+      controlBasemap:window.mapControls.basemap,
+      controlMeasureShortcut:window.mapControls.measureShortcut,
+      controlIdentifyToggle:window.mapControls.identifyToggle});
     
   }
 
@@ -65,38 +71,115 @@ class Settings extends Component {
     this.props.onClose();
   }
 
-  applyControlSettings = () =>{
-    let map = window.map;
-    if (this.state.controlRotate){
-      helpers.addMapControl(map, "rotate")
-    }else{
-      helpers.removeMapControl(map, "rotate")
-    }
-    if (this.state.controlFullScreen){
-      helpers.addMapControl(map, "fullscreen")
-    }else{
-      helpers.removeMapControl(map, "fullscreen")
-    }
-    if (this.state.controlZoomInOut){
-      helpers.addMapControl(map, "zoom")
-    }else{
-      helpers.removeMapControl(map, "zoom")
-    }
-    if (this.state.controlScaleLine){
-      helpers.addMapControl(map, "scaleLine")
-    }else{
-      helpers.removeMapControl(map, "scaleLine")
-    }
+  onRotateControl = () => {
+    this.setState({controlRotate:!this.state.controlRotate},() =>{ 
+      window.mapControls.rotate = this.state.controlRotate;
+      let map = window.map;
+      if (this.state.controlRotate){
+        helpers.addMapControl(map, "rotate")
+      }else{
+        helpers.removeMapControl(map, "rotate")
+      }
+      this.saveControlSettings();
+    });
+  }
 
-    //EMIT CHANGE NOTICE FOR ITEMS IN THE NAVIGATION PANEL
-    window.emitter.emit("mapControlsChanged","fullExtent",this.state.controlZoomExtent);
-    window.emitter.emit("mapControlsChanged","zoomToCurrentLocation",this.state.controlCurrentLocation);
-    //EMIT CHANGE NOTICE FOR ITEMS IN THE FOOTER PANEL
-    window.emitter.emit("mapControlsChanged","scale",this.state.controlScale);
-    //EMIT CHANGE NOTICE FOR BASEMAP SWITCHER
-    window.emitter.emit("mapControlsChanged","basemap",this.state.controlBasemap);
-    //EMIT CHANGE NOTICE FOR ADDITIONAL ITEMS
-    window.emitter.emit("mapControlsChanged","fullscreen",this.state.controlFullScreen);
+  onFullScreenControl = () => {
+    this.setState({controlFullScreen:!this.state.controlFullScreen},() =>{ 
+      window.mapControls.fullScreen = this.state.controlFullScreen;
+      let map = window.map;
+    
+      if (this.state.controlFullScreen){
+        helpers.addMapControl(map, "fullscreen")
+      }else{
+        helpers.removeMapControl(map, "fullscreen")
+      }
+      //EMIT CHANGE NOTICE FOR ADDITIONAL ITEMS
+      window.emitter.emit("mapControlsChanged","fullscreen",this.state.controlFullScreen);
+      this.saveControlSettings();
+    });
+  }
+
+
+  onZoomInOutControl = () => {
+    this.setState({controlZoomInOut:!this.state.controlZoomInOut},() =>{ 
+      window.mapControls.zoomInOut = this.state.controlZoomInOut;
+      let map = window.map;
+    
+      if (this.state.controlZoomInOut){
+        helpers.addMapControl(map, "zoom")
+      }else{
+        helpers.removeMapControl(map, "zoom")
+      }
+      this.saveControlSettings();
+    });
+  }
+
+  onScaleLineControl = () => {
+    this.setState({controlScaleLine:!this.state.controlScaleLine},() =>{ 
+      window.mapControls.scaleLine = this.state.controlScaleLine;
+      let map = window.map;
+    
+      if (this.state.controlScaleLine){
+        helpers.addMapControl(map, "scaleLine")
+      }else{
+        helpers.removeMapControl(map, "scaleLine")
+      }
+      this.saveControlSettings();
+    });
+  }
+
+  onScaleControl = () => {
+    this.setState({controlScale:!this.state.controlScale},() =>{ 
+      window.mapControls.scale = this.state.controlScale;
+      //EMIT CHANGE NOTICE FOR ITEMS IN THE FOOTER PANEL
+      window.emitter.emit("mapControlsChanged","scale",this.state.controlScale);
+      this.saveControlSettings();
+    });
+  }
+
+  onCurrentLocationControl = () => {
+    this.setState({controlCurrentLocation:!this.state.controlCurrentLocation},() =>{ 
+      window.mapControls.currentLocation = this.state.controlCurrentLocation;
+      //EMIT CHANGE NOTICE FOR ITEMS IN THE NAVIGATION PANEL
+      window.emitter.emit("mapControlsChanged","zoomToCurrentLocation",this.state.controlCurrentLocation);
+      this.saveControlSettings();
+    });
+  }
+
+  onZoomExtentControl = () => {
+    this.setState({controlZoomExtent:!this.state.controlZoomExtent},() =>{ 
+      window.mapControls.zoomExtent = this.state.controlZoomExtent;
+      //EMIT CHANGE NOTICE FOR ITEMS IN THE NAVIGATION PANEL
+      window.emitter.emit("mapControlsChanged","fullExtent",this.state.controlZoomExtent);
+      this.saveControlSettings();
+    });
+  }
+  onIdentifyToggleControl = () => {
+    this.setState({controlIdentifyToggle:!this.state.controlIdentifyToggle},() =>{ 
+      window.mapControls.identifyToggle = this.state.controlIdentifyToggle;
+      //EMIT CHANGE NOTICE FOR ITEMS IN THE NAVIGATION PANEL
+      window.emitter.emit("mapControlsChanged","identifyToggle",this.state.controlIdentifyToggle);
+      this.saveControlSettings();
+    });
+  }
+  onMeasureShortcutControl = () => {
+    this.setState({controlMeasureShortcut:!this.state.controlMeasureShortcut},() =>{ 
+      window.mapControls.measureShortcut = this.state.controlMeasureShortcut;
+      //EMIT CHANGE NOTICE FOR ITEMS IN THE NAVIGATION PANEL
+      window.emitter.emit("mapControlsChanged","measureShortcut",this.state.controlMeasureShortcut);
+      this.saveControlSettings();
+    });
+  }
+  onBasemapControl = () => {
+    this.setState({controlBasemap:!this.state.controlBasemap},() =>{ 
+      window.mapControls.basemap = this.state.controlBasemap;
+      //EMIT CHANGE NOTICE FOR BASEMAP SWITCHER
+      window.emitter.emit("mapControlsChanged","basemap",this.state.controlBasemap);
+      this.saveControlSettings();
+    });
+  }
+  saveControlSettings = () =>{
     helpers.saveToStorage(this.storageKeyMapControls,window.mapControls)
   }
   
@@ -132,7 +215,7 @@ class Settings extends Component {
                         type="checkbox"
                         className="sc-settings-checkbox"
                         checked={this.state.controlRotate}
-                        onChange={() => {this.setState({controlRotate:!this.state.controlRotate},() =>{ window.mapControls.rotate = this.state.controlRotate;});}} />
+                        onChange={this.onRotateControl} />
                 </span>
               </div>
               <div className="sc-settings-row sc-arrow">
@@ -143,7 +226,7 @@ class Settings extends Component {
                         type="checkbox"
                         className="sc-settings-checkbox"
                         checked={this.state.controlFullScreen}
-                        onChange={() => {this.setState({controlFullScreen:!this.state.controlFullScreen},() =>{ window.mapControls.fullScreen = this.state.controlFullScreen;});}} />
+                        onChange={this.onFullScreenControl} />
                 </span>
               </div>
               <div className="sc-settings-row sc-arrow">
@@ -154,7 +237,7 @@ class Settings extends Component {
                         type="checkbox"
                         className="sc-settings-checkbox"
                         checked={this.state.controlZoomInOut}
-                        onChange={() => {this.setState({controlZoomInOut:!this.state.controlZoomInOut},() =>{ window.mapControls.zoomInOut = this.state.controlZoomInOut;});}} />
+                        onChange={this.onZoomInOutControl} />
                 </span>
               </div>
               <div className="sc-settings-row sc-arrow">
@@ -165,7 +248,7 @@ class Settings extends Component {
                         type="checkbox"
                         className="sc-settings-checkbox"
                         checked={this.state.controlCurrentLocation}
-                        onChange={() => {this.setState({controlCurrentLocation:!this.state.controlCurrentLocation},() =>{ window.mapControls.currentLocation = this.state.controlCurrentLocation;});}} />
+                        onChange={this.onCurrentLocationControl} />
                 </span>
               </div>
               <div className="sc-settings-row sc-arrow">
@@ -176,7 +259,29 @@ class Settings extends Component {
                         type="checkbox"
                         className="sc-settings-checkbox"
                         checked={this.state.controlZoomExtent}
-                        onChange={() => {this.setState({controlZoomExtent:!this.state.controlZoomExtent},() =>{ window.mapControls.zoomExtent = this.state.controlZoomExtent;});}} />
+                        onChange={this.onZoomExtentControl} />
+                </span>
+              </div>
+              <div className="sc-settings-row sc-arrow">
+                <label>Identify Toggle:</label>
+                <span>
+                    <input
+                        name="controlIdentifyToggle"
+                        type="checkbox"
+                        className="sc-settings-checkbox"
+                        checked={this.state.controlIdentifyToggle}
+                        onChange={this.onIdentifyToggleControl} />
+                </span>
+              </div>
+              <div className="sc-settings-row sc-arrow">
+                <label>Measure Shortcut:</label>
+                <span>
+                    <input
+                        name="controlMeasureShortcut"
+                        type="checkbox"
+                        className="sc-settings-checkbox"
+                        checked={this.state.controlMeasureShortcut}
+                        onChange={this.onMeasureShortcutControl} />
                 </span>
               </div>
               <div className="sc-settings-row sc-arrow">
@@ -187,7 +292,7 @@ class Settings extends Component {
                         type="checkbox"
                         className="sc-settings-checkbox"
                         checked={this.state.controlScale}
-                        onChange={() => {this.setState({controlScale:!this.state.controlScale},() =>{ window.mapControls.scale = this.state.controlScale;});}} />
+                        onChange={this.onScaleControl} />
                 </span>
               </div>
               <div className="sc-settings-row sc-arrow">
@@ -198,7 +303,7 @@ class Settings extends Component {
                         type="checkbox"
                         className="sc-settings-checkbox"
                         checked={this.state.controlScaleLine}
-                        onChange={() => {this.setState({controlScaleLine:!this.state.controlScaleLine},() =>{ window.mapControls.scaleLine = this.state.controlScaleLine;});}} />
+                        onChange={this.onScaleLineControl} />
                 </span>
               </div>
               <div className="sc-settings-row sc-arrow">
@@ -209,12 +314,10 @@ class Settings extends Component {
                         type="checkbox"
                         className="sc-settings-checkbox"
                         checked={this.state.controlBasemap}
-                        onChange={() => {this.setState({controlBasemap:!this.state.controlBasemap},() =>{ window.mapControls.basemap = this.state.controlBasemap;});}} />
+                        onChange={this.onBasemapControl} />
                 </span>
               </div>
-              <div className="sc-float-right">
-                  <button name="applyControlSettings" className="sc-button" onClick={this.applyControlSettings}>Save/Apply</button>
-              </div>
+              
             </div>
             <div className="sc-settings-divider"></div>           
             <div className="sc-title sc-settings-title">LOCAL STORAGE</div>

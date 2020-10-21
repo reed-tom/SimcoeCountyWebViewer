@@ -39,7 +39,7 @@ class App extends Component {
   setControlPreferences(){
     const localMapControls = helpers.getItemsFromStorage("Map Control Settings");
     
-    if (localMapControls !== undefined ) window.mapControls = localMapControls;
+    if (localMapControls !== undefined ) window.mapControls = { ...mainConfig.controls, ...localMapControls};
     else window.mapControls = mainConfig.controls;
   }
   render() {

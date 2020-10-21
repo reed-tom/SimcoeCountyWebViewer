@@ -25,7 +25,10 @@ class Navigation extends Component {
   }
 
   componentDidMount(){
-    this.setState({showCurrentLocation:window.mapControls.currentLocation, showZoomExtent:window.mapControls.zoomExtent  });
+    this.setState({showCurrentLocation:window.mapControls.currentLocation,
+                   showZoomExtent:window.mapControls.zoomExtent,
+                   showIdentifyFeature:window.mapControls.identifyToggle,
+                   showMeasureButton:window.mapControls.measureShortcut});
 
   }
   /*
@@ -105,6 +108,18 @@ class Navigation extends Component {
       case "zoomToCurrentLocation":
         this.setState({showCurrentLocation:state});
         break;
+      case "zoomToCurrentLocation":
+        this.setState({showCurrentLocation:state});
+        break;
+      case "zoomToCurrentLocation":
+          this.setState({showCurrentLocation:state});
+          break;
+      case "identifyToggle":
+        this.setState({showIdentifyFeature:state});
+        break;
+      case "measureShortcut":
+          this.setState({showMeasureButton:state});
+          break;
       default:
         break;
     }

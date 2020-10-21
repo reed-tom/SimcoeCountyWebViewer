@@ -28,7 +28,9 @@
     "zoomExtent":true,
     "scale":true,
     "scaleLine":true,
-    "basemap":true
+    "basemap":true,
+    "identifyToggle":true,
+    "measureShortcut":true
   },
  
   "sidebarToolComponents": [
