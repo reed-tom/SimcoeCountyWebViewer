@@ -108,12 +108,6 @@ class Navigation extends Component {
       case "zoomToCurrentLocation":
         this.setState({showCurrentLocation:state});
         break;
-      case "zoomToCurrentLocation":
-        this.setState({showCurrentLocation:state});
-        break;
-      case "zoomToCurrentLocation":
-          this.setState({showCurrentLocation:state});
-          break;
       case "identifyToggle":
         this.setState({showIdentifyFeature:state});
         break;
