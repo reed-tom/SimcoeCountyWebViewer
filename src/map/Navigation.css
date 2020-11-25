@@ -1,12 +1,5 @@
-.nav-container {
-  top: 158px;
-  /* left: 10px; */
-  left: 69px;
-  height: 37px;
-  width: 37px;
-  position: absolute;
-  z-index: 2;
-}
+
+
 .nav-container-slidein {
   /* transform: translateX(-375px);
         transition: transform 400ms ease-in; */
@@ -82,10 +75,20 @@ background-position: center center;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(210, 210, 210, 1) 100%) !important;
 }
 
+@media only screen and (min-width: 770px) {
+  .nav-container {
+    top: 158px;
+    left: 69px;
+    height: 37px;
+    width: 37px;
+    position: absolute;
+    z-index: 2;
+  }
+}
 @media only screen and (max-width: 770px) {
   .nav-container {
-    top: 61px;
-    left: 10px;
+    top: 158px;
+    left: 5px;
     height: 37px;
     width: 37px;
     position: absolute;
