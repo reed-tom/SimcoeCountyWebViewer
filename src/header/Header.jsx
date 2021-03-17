@@ -98,6 +98,7 @@ class Header extends Component {
           <img style={{ marginTop: "5px" }} src={require("./images/feedback.png")} alt="feedback" />
           Feedback
         </div>
+      </div>
     );
   }
 }
