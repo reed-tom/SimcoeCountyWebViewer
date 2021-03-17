@@ -5,17 +5,17 @@ import ReactDOM from "react-dom";
 // OPEN LAYERS
 import Feature from "ol/Feature";
 import * as ol from "ol";
-import { Image as ImageLayer,Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
-import { ImageWMS, OSM, TileArcGISRest,  TileImage, Vector,XYZ} from "ol/source.js";
+import { Image as ImageLayer, Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
+import { ImageWMS, OSM, TileArcGISRest, TileImage, Vector, XYZ } from "ol/source.js";
 
 //import {file as FileLoader} from "ol/featureloader.js";
-import { GeoJSON,WKT } from "ol/format.js"; 
+import { GeoJSON, WKT } from "ol/format.js";
 import TileGrid from "ol/tilegrid/TileGrid.js";
 import Point from "ol/geom/Point";
 import { getTopLeft } from "ol/extent.js";
 import { easeOut } from "ol/easing";
 import { Fill, Stroke, Style, Circle as CircleStyle, Text as TextStyle } from "ol/style";
-import {  ScaleLine, FullScreen, Rotate, Zoom} from "ol/control.js";
+import { ScaleLine, FullScreen, Rotate, Zoom } from "ol/control.js";
 import { unByKey } from "ol/Observable.js";
 import { transform } from "ol/proj.js";
 import Projection from "ol/proj/Projection.js";
@@ -35,8 +35,7 @@ import mainConfig from "../config.json";
 import { InfoRow } from "./InfoRow.jsx";
 import blankImage from "./images/blank.png";
 
-
-export function getConfigValue(key){
+export function getConfigValue(key) {
   const config = mainConfig;
   return config[key];
 }
@@ -47,23 +46,23 @@ register(proj4);
 // UTM NAD 83
 const _nad83Proj = new Projection({
   code: "EPSG:26917",
-  extent: [194772.8107, 2657478.7094, 805227.1893, 9217519.4415]
+  extent: [194772.8107, 2657478.7094, 805227.1893, 9217519.4415],
 });
-export function tryParseJSON (jsonString){
+export function tryParseJSON(jsonString) {
   try {
-      var obj = JSON.parse(jsonString);
-      if (obj && typeof obj === "object") {
-          return obj;
-      }
-  }
-  catch (e) { }
+    var obj = JSON.parse(jsonString);
+    if (obj && typeof obj === "object") {
+      return obj;
+    }
+  } catch (e) {}
   return false;
 }
 
 export function sortByKey(array, key) {
   return array.sort(function(a, b) {
-      var x = a[key]; var y = b[key];
-      return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    var x = a[key];
+    var y = b[key];
+    return x < y ? -1 : x > y ? 1 : 0;
   });
 }
 // APP STAT
@@ -71,19 +70,17 @@ export function addAppStat(type, description) {
   if (mainConfig.includeAppStats === false) return;
   // IGNORE LOCAL HOST DEV
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
-  const build = (appName, version) =>  `${appName}-${version}`;
+  const build = (appName, version) => `${appName}-${version}`;
   const appStatsTemplate = (build, type, description) => `${mainConfig.appStatsUrl}${build}/${type}/${description}`;
   let buildname = window.location.pathname.split("/").join("");
-  if (window.version !== undefined && window.version !== null)
-  {
-    if (window.app !== undefined && window.app !== null)
-    { 
-      buildname += build(window.app,window.version)
-    }else{
-      buildname = build(buildname,window.version)
+  if (window.version !== undefined && window.version !== null) {
+    if (window.app !== undefined && window.app !== null) {
+      buildname += build(window.app, window.version);
+    } else {
+      buildname = build(buildname, window.version);
     }
-    
   }
+  if (buildname === "") buildname = "Unknown";
   httpGetText(appStatsTemplate(buildname, type, description));
 }
 
@@ -105,20 +102,27 @@ export function isMobile() {
 }
 
 // SHOW URL WINDOW
-export function showURLWindow(url, showFooter = false, mode = "normal", honorDontShow = false) {
+export function showURLWindow(url, showFooter = false, mode = "normal", honorDontShow = false, hideScroll=false) {
+  console.log(url);
   let isSameOrigin = true;
-  if (url !== undefined) isSameOrigin = url.toLowerCase().indexOf(window.location.origin.toLowerCase()) !== -1;
+  if (mainConfig.restrictOriginForUrlWindow) {
+    if (url !== undefined) isSameOrigin = url.toLowerCase().indexOf(window.location.origin.toLowerCase()) !== -1;
+  }
+
   if (isSameOrigin) {
-    ReactDOM.render(<URLWindow key={shortid.generate()} mode={mode} showFooter={showFooter} url={url} honorDontShow={honorDontShow} />, document.getElementById("map-modal-window"));
-  }else{
+    ReactDOM.render(
+      <URLWindow key={shortid.generate()} mode={mode} showFooter={showFooter} url={url} honorDontShow={honorDontShow} hideScroll={hideScroll} />,
+      document.getElementById("map-modal-window")
+    );
+  } else {
     window.open(url, "_blank");
   }
 }
 
 export function export_file(filename, content) {
-  var pom = document.createElement('a');
-  pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
-  pom.setAttribute('download', filename);
+  var pom = document.createElement("a");
+  pom.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(content));
+  pom.setAttribute("download", filename);
   pom.click();
 }
 // GET ARCGIS TILED LAYER
@@ -126,31 +130,67 @@ export function getArcGISTiledLayer(url) {
   return new TileLayer({
     source: new TileArcGISRest({
       url: url,
-      crossOrigin: "anonymous"
+      crossOrigin: "anonymous",
+      // tileLoadFunction: function(tile, src) {
+      //   var xhr = new XMLHttpRequest();
+
+      //   // var to = null;
+      //   // var handle = setTimeout(() => {
+      //   //   console.log("image took too long");
+      //   //   to = "yes";
+      //   //   return null;
+      //   // }, 1000);
+      //   // console.log(handle);
+      //   xhr.open("GET", src);
+      //   xhr.responseType = "arraybuffer";
+
+      //   xhr.onload = function() {
+      //     // console.log(handle);
+      //     // console.log(to);
+
+      //     var arrayBufferView = new Uint8Array(this.response);
+      //     var blob = new Blob([arrayBufferView], { type: "image/png" });
+      //     var urlCreator = window.URL || window.webkitURL;
+      //     var imageUrl = urlCreator.createObjectURL(blob);
+      //     tile.getImage().src = imageUrl;
+      //   };
+      //   xhr.send();
+      // },
     }),
-    crossOrigin: "anonymous"
+    crossOrigin: "anonymous",
   });
 }
 
 export function getESRITileXYZLayer(url) {
+  const rebuildParams = {
+    sourceType: "ESRITileXYZ",
+    url: url,
+  };
   return new TileLayer({
+    rebuildParams: rebuildParams,
     source: new XYZ({
       attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
       url: url + "/tile/{z}/{y}/{x}",
-      crossOrigin: "anonymous"
+      crossOrigin: "anonymous",
     }),
-    crossOrigin: "anonymous"
   });
 }
 
 export function getOSMTileXYZLayer(url) {
+  const rebuildParams = {
+    sourceType: "OSMTileXYZ",
+    url: url,
+  };
   return new TileLayer({
+    rebuildParams: rebuildParams,
     source: new OSM({ url: url + "/{z}/{x}/{y}.png" }),
-    crossOrigin: "anonymous"
+    crossOrigin: "anonymous",
   });
 }
 
 export function getSimcoeTileXYZLayer(url) {
+  
+  // console.log(url);
   const resolutions = [
     305.74811314055756,
     152.87405657041106,
@@ -163,7 +203,7 @@ export function getSimcoeTileXYZLayer(url) {
     1.1943285668550503,
     0.5971642835598172,
     0.29858214164761665,
-    0.1492252984505969
+    0.1492252984505969,
   ];
   const projExtent = window.map
     .getView()
@@ -172,11 +212,15 @@ export function getSimcoeTileXYZLayer(url) {
   var tileGrid = new TileGrid({
     resolutions: resolutions,
     tileSize: [256, 256],
-    origin: getTopLeft(projExtent)
+    origin: getTopLeft(projExtent),
     //origin: [-20037500.342787,20037378.342787 ]
     // origin: [-20037508.342787,20037508.342787 ]
   });
 
+  const rebuildParams = {
+    sourceType: "SimcoeTileXYZ",
+    url: url,
+  };
   var source = new TileImage({
     tileUrlFunction: function(tileCoord, pixelRatio, projection) {
       if (tileCoord === null) return undefined;
@@ -190,74 +234,87 @@ export function getSimcoeTileXYZLayer(url) {
       return url + "/tile/" + z + "/" + y + "/" + x;
     },
     tileGrid: tileGrid,
-    crossOrigin: "anonymous"
+    crossOrigin: "anonymous",
   });
   source.on("tileloaderror", function(event) {
     // BROWSER STILL KICKS OUT 404 ERRORS.  ANYBODY KNOW A WAY TO PREVENT THE ERRORS IN THE BROWSER?
-    //console.log("erro");
     event.tile.getImage().src = blankImage;
+    
     // var tileLoadFunction = function(imageTile, src) {
     //   imageTile.getImage().src = blankImage;
     // };
-    // if (event.tile.tileLoadFunction_ !== tileLoadFunction) {
+    //  if (event.tile.tileLoadFunction_ !== tileLoadFunction) {
     //   event.tile.tileLoadFunction_ = tileLoadFunction;
     //   event.tile.load();
     // }
   });
 
   return new TileLayer({
+    rebuildParams: rebuildParams,
     projection: "EPSG:4326",
     //projection: 'EPSG:3857',
     //matrixSet: 'EPSG:3857',
     source: source,
     maxResolution: 400,
-    useInterimTiles: true
+    useInterimTiles: true,
   });
 }
 
 // GET OPEN STREET MAP LAYER
 export function getOSMLayer() {
+  const rebuildParams = {
+    sourceType: "OSM",
+  };
   return new TileLayer({
+    rebuildParams:rebuildParams,
     source: new OSM(),
-    crossOrigin: "anonymous"
+    crossOrigin: "anonymous",
   });
 }
-export function getViewRotation(){
+export function getViewRotation() {
   var rotation = parseFloat(0);
   if (window.map === undefined) return rotation;
   rotation = window.map.getView().getProperties().rotation;
-  return (rotation * (180/Math.PI)); 
+  return rotation * (180 / Math.PI);
 }
 
-export function updateWMSRotation(){
-  const layers =  window.map.getLayers();
+export function updateWMSRotation() {
+  const layers = window.map.getLayers();
   let currentRotation = getViewRotation();
   console.log(getViewRotation());
   if (layers.array_.length > 0) {
-    layers.forEach(layer => {
-      if (layer instanceof ImageLayer){
-        
+    layers.forEach((layer) => {
+      if (layer instanceof ImageLayer) {
         let source = layer.getSource();
-        source.updateParams({angle:currentRotation,});
+        source.updateParams({ angle: currentRotation });
         layer.setSource(source);
       }
-
     });
-    window.map.getView().setProperties({rotation:0});
+    window.map.getView().setProperties({ rotation: 0 });
   }
 }
 // GET WMS Image Layer
 export function getImageWMSLayer(serverURL, layers, serverType = "geoserver", cqlFilter = null, zIndex = null, disableParcelClick = null) {
+  const rebuildParams = {
+    sourceType: "ImageWMS",
+    url: serverURL,
+    layers:layers,
+    serverType: serverType,
+    cqlFilter: cqlFilter,
+    zIndex: zIndex,
+    disableParcelClick: disableParcelClick,
+  };
   let imageLayer = new ImageLayer({
+    rebuildParams: rebuildParams,
     visible: false,
     zIndex: zIndex,
     source: new ImageWMS({
       url: serverURL,
-      params: { VERSION:"1.3.0", LAYERS: layers, cql_filter: cqlFilter},
+      params: { VERSION: "1.3.0", LAYERS: layers, cql_filter: cqlFilter },
       ratio: 1,
       serverType: serverType,
-      crossOrigin: "anonymous"
-    })
+      crossOrigin: "anonymous",
+    }),
   });
 
   const wfsUrlTemplate = (serverUrl, layer) => `${serverUrl}/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=${layer}&outputFormat=application/json&cql_filter=`;
@@ -270,9 +327,18 @@ export function getImageWMSLayer(serverURL, layers, serverType = "geoserver", cq
 
   if (layerNameOnly === "Assessment Parcel") disableParcelClick = false;
 
-  imageLayer.setProperties({ wfsUrl: wfsUrl, name: layerNameOnly, rootInfoUrl: rootInfoUrl,  disableParcelClick: disableParcelClick });
+  imageLayer.setProperties({ wfsUrl: wfsUrl, name: layerNameOnly, rootInfoUrl: rootInfoUrl, disableParcelClick: disableParcelClick });
   return imageLayer;
 }
+
+export function scaleToResolution(scale){
+  const DOTS_PER_INCH = 96;
+  const INCHES_PER_METER = 39.37;
+  const pointResolution = parseFloat(scale) / (DOTS_PER_INCH * INCHES_PER_METER);
+  var projection = window.map.getView().getProjection();
+  return pointResolution / projection.getMetersPerUnit();
+}
+
 // GET CURRENT MAP SCALE
 export function getMapScale() {
   const DOTS_PER_INCH = 96;
@@ -283,53 +349,55 @@ export function getMapScale() {
   return Math.round(pointResolution * DOTS_PER_INCH * INCHES_PER_METER);
 }
 
-
-
 // SET CURRENT MAP SCALE
 export function setMapScale(scale) {
   const DOTS_PER_INCH = 96;
   const INCHES_PER_METER = 39.37;
-  const pointResolution = parseFloat(scale)/(DOTS_PER_INCH * INCHES_PER_METER);
+  const pointResolution = parseFloat(scale) / (DOTS_PER_INCH * INCHES_PER_METER);
   var projection = window.map.getView().getProjection();
-  var resolution =pointResolution/projection.getMetersPerUnit();
+  var resolution = pointResolution / projection.getMetersPerUnit();
   window.map.getView().setResolution(resolution);
 }
 
 // SHOW DISCLAIMER
 export const messageColors = {
-  gray:"gray",
-  green:"green",
-  blue:"blue",
-  red:"red",
-  yellow:"yellow",
-  orange:"orange"
+  gray: "gray",
+  green: "green",
+  blue: "blue",
+  red: "red",
+  yellow: "yellow",
+  orange: "orange",
+};
+export function getHash(input) {
+  return input.split("").reduce((a, b) => {
+    a = (a << 5) - a + b.charCodeAt(0);
+    return a & a;
+  }, 0);
 }
-export function getHash(input){
-  return input.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0)
-}
-export function showTerms(title = "Terms and Condition", messageText = "Message",url = "", color = messageColors.green, accept, decline) {
+export function showTerms(title = "Terms and Condition", messageText = "Message", url = "", color = messageColors.green, accept, decline) {
   const domId = "portal-root";
   const termsDomId = "sc-show-terms-root";
 
- ReactDOM.render(
-  <ShowTerms 
-    id={domId} 
-    key={termsDomId} 
-    title={title} 
-    message={messageText}
-    color={color} 
-    url={url} 
-    onAcceptClick={accept} 
-    onDeclineClick={decline} 
-    onClose={(ref) =>{
-      try {
-        ReactDOM.unmountComponentAtNode(ref.current.parentNode);
-      } catch (err) {
-        console.log(err);
+  ReactDOM.render(
+    <ShowTerms
+      id={domId}
+      key={termsDomId}
+      title={title}
+      message={messageText}
+      color={color}
+      url={url}
+      onAcceptClick={accept}
+      onDeclineClick={decline}
+      onClose={(ref) => {
+        try {
+          ReactDOM.unmountComponentAtNode(ref.current.parentNode);
+        } catch (err) {
+          console.log(err);
+        }
       }}
-    } 
-  />, document.getElementById("portal-root"));
-  
+    />,
+    document.getElementById("portal-root")
+  );
 }
 
 // SHOW MESSAGE
@@ -338,15 +406,31 @@ export function showMessage(title = "Info", messageText = "Message", color = mes
   var existingMsg = document.getElementById(domId);
   if (existingMsg !== undefined && existingMsg !== null) existingMsg.remove();
 
-  const message = ReactDOM.render(<ShowMessage id={domId} key={domId} title={title} message={messageText} color={color} hideButton={hideButton} />, document.getElementById("sc-sidebar-message-container"));
-
-  setTimeout(() => {
-    try {
-      ReactDOM.unmountComponentAtNode(message.myRef.current.parentNode);
-    } catch (err) {
-      console.log(err);
+  const message = ReactDOM.render(
+    <ShowMessage id={domId} key={domId} title={title} message={messageText} color={color} hideButton={hideButton} />,
+    document.getElementById("sc-sidebar-message-container"),
+    ()=>{
+      setTimeout(() => {
+        try {
+          ReactDOM.unmountComponentAtNode(document.getElementById("sc-sidebar-message-container"));
+        } catch (err) {
+          console.log(err);
+        }
+      }, timeout);
     }
-  }, timeout);
+  );
+
+  //console.log(message);
+  // setTimeout(() => {
+  //   try {
+  //     ReactDOM.unmountComponentAtNode(message.myRef.current.parentNode);
+  //   } catch (err) {
+  //     const domId = "sc-show-message-content";
+  //     var existingMsg = document.getElementById(domId);
+  //     if (existingMsg !== undefined && existingMsg !== null) existingMsg.remove();
+  //     console.log(err);
+  //   }
+  // }, timeout);
 }
 
 export function searchArrayByKey(nameKey, myArray) {
@@ -370,25 +454,40 @@ export function getURLParameter(parameterName, decoded = true) {
 // HTTP GET (NO WAITING)
 export function httpGetText(url, callback) {
   return fetch(url)
-    .then(response => response.text())
-    .then(responseText => {
+    .then((response) => response.text())
+    .then((responseText) => {
       // CALLBACK WITH RESULT
       if (callback !== undefined) callback(responseText);
     })
-    .catch(error => {
-      console.error(error);
+    .catch((error) => {
+      //httpGetText(url.replace("opengis.simcoe.ca", "opengis2.simcoe.ca"), callback);
+      console.error(url, error);
+    });
+}
+
+// HTTP GET (NO WAITING)
+export function httpGetTextWithParams(url,params=undefined, callback) {
+  return fetch(url, params)
+    .then((response) => response.text())
+    .then((responseText) => {
+      // CALLBACK WITH RESULT
+      if (callback !== undefined) callback(responseText);
+    })
+    .catch((error) => {
+      //httpGetText(url.replace("opengis.simcoe.ca", "opengis2.simcoe.ca"), callback);
+      console.error(url, error);
     });
 }
 
 // HTTP GET WAIT
 export async function httpGetTextWait(url, callback) {
   let data = await fetch(url)
-    .then(response => {
+    .then((response) => {
       const resp = response.text();
       //console.log(resp);
       return resp;
     })
-    .catch(err => {
+    .catch((err) => {
       console.log("Error: ", err);
     });
   if (callback !== undefined) {
@@ -401,25 +500,25 @@ export async function httpGetTextWait(url, callback) {
 // GET JSON (NO WAITING)
 export function getJSON(url, callback) {
   return fetch(url)
-    .then(response => response.json())
-    .then(responseJson => {
+    .then((response) => response.json())
+    .then((responseJson) => {
       // CALLBACK WITH RESULT
       if (callback !== undefined) callback(responseJson);
     })
-    .catch(error => {
-      console.error("Error: ",error, "URL:", url);
+    .catch((error) => {
+      console.error("Error: ", error, "URL:", url);
     });
 }
 
 // GET JSON WAIT
 export async function getJSONWait(url, callback) {
   let data = await await fetch(url)
-    .then(res => {
+    .then((res) => {
       const resp = res.json();
       //console.log(resp);
       return resp;
     })
-    .catch(err => {
+    .catch((err) => {
       console.log("Error: ", err, "URL:", url);
     });
   if (callback !== undefined) {
@@ -432,8 +531,8 @@ export async function getJSONWait(url, callback) {
 
 export function getObjectFromXMLUrl(url, callback) {
   return fetch(url)
-    .then(response => response.text())
-    .then(responseText => {
+    .then((response) => response.text())
+    .then((responseText) => {
       // CALLBACK WITH RESULT
       if (callback !== undefined) {
         parseString(responseText, function(err, result) {
@@ -441,7 +540,7 @@ export function getObjectFromXMLUrl(url, callback) {
         });
       }
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(error);
     });
 }
@@ -457,7 +556,7 @@ export function isParcelClickEnabled() {
 export function getWFSVectorSource(serverUrl, layerName, callback, sortField = "") {
   const wfsUrlTemplate = (serverURL, layerName, sortField) => `${serverURL}wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=${layerName}&outputFormat=application/json&sortBy=${sortField}`;
   const wfsUrl = wfsUrlTemplate(serverUrl, layerName, sortField);
-  getJSON(wfsUrl, result => {
+  getJSON(wfsUrl, (result) => {
     const geoJSON = new GeoJSON().readFeatures(result);
     var vectorSource = new Vector({ features: geoJSON });
     callback(vectorSource);
@@ -471,13 +570,19 @@ export function getWFSGeoJSON(serverUrl, layerName, callback, sortField = null, 
   if (sortField !== null) additionalParams += "&sortBy=" + sortField;
 
   // BBOX EXTENT
-  if (extent !== null) {
+  if (extent !== null && (cqlFilter === null || cqlFilter.length === 0)) {
     const extentString = extent[0] + "," + extent[1] + "," + extent[2] + "," + extent[3];
     additionalParams += "&bbox=" + extentString;
   }
 
   // ATTRIBUTE WHERECLAUSE
-  if (cqlFilter !== null && cqlFilter.length !== 0) additionalParams += "&cql_filter=" + cqlFilter;
+  if (cqlFilter !== null && cqlFilter.length !== 0) {
+    additionalParams += "&cql_filter=" + cqlFilter;
+    if (extent !== null) {
+      const extentString = extent[0] + "," + extent[1] + "," + extent[2] + "," + extent[3];
+      additionalParams += " AND BBOX(geom, " + extentString + ")";
+    }
+  }
 
   // COUNT
   if (count !== null) additionalParams += "&count=" + count;
@@ -485,7 +590,7 @@ export function getWFSGeoJSON(serverUrl, layerName, callback, sortField = null, 
   // USE TEMPLATE FOR READABILITY
   const wfsUrlTemplate = (serverURL, layerName) => `${serverURL}wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=${layerName}&outputFormat=application/json`;
   const wfsUrl = wfsUrlTemplate(serverUrl, layerName) + additionalParams;
-  getJSON(wfsUrl, result => {
+  getJSON(wfsUrl, (result) => {
     const geoJSON = new GeoJSON().readFeatures(result);
     callback(geoJSON);
   });
@@ -495,7 +600,7 @@ export function getWFSLayerRecordCount(serverUrl, layerName, callback) {
   const recordCountUrlTemplate = (serverURL, layerName) => `${serverURL}wfs?REQUEST=GetFeature&VERSION=1.1&typeName=${layerName}&RESULTTYPE=hits`;
   const recordCountUrl = recordCountUrlTemplate(serverUrl, layerName);
 
-  getObjectFromXMLUrl(recordCountUrl, result => {
+  getObjectFromXMLUrl(recordCountUrl, (result) => {
     callback(result["wfs:FeatureCollection"]["$"].numberOfFeatures);
   });
 }
@@ -503,24 +608,21 @@ export function getWFSLayerRecordCount(serverUrl, layerName, callback) {
 export function zoomToFeature(feature, animate = true) {
   let geom = feature.getGeometry();
   let duration = animate ? 1000 : 0;
-
+  let minResolution = scaleToResolution(feature.minScale);
+  minResolution = minResolution>1 ? Math.ceil(minResolution) : 1;
   if (geom.getType() === "Point") {
-    window.map.getView().fit(geom,window.map.getSize(), { duration: duration, minResolution: 1});
-    window.map.getView().setZoom(window.map.getView().getZoom() - 1);
+    window.map.getView().fit(geom, { duration: duration, minResolution: minResolution});
   } else if (geom.getType() === "GeometryCollection") {
-    window.map.getView().fit(geom.getGeometries()[0],window.map.getSize(), { duration: duration, minResolution: 1});
-    window.map.getView().setZoom(window.map.getView().getZoom() - 1);
+    window.map.getView().fit(geom.getGeometries()[0],  { duration: duration, minResolution: minResolution});
   } else {
-    window.map.getView().fit(geom,window.map.getSize(), { duration: duration });
-    window.map.getView().setZoom(window.map.getView().getZoom() - 1);
+    window.map.getView().fit(geom, { duration: duration, minResolution: minResolution});
   }
-  
 }
 
 // THIS RETURNS THE ACTUAL REACT ELEMENT USING DOM ID
 export function findReact(domId) {
   var dom = document.getElementById(domId);
-  let key = Object.keys(dom).find(key => key.startsWith("__reactInternalInstance$"));
+  let key = Object.keys(dom).find((key) => key.startsWith("__reactInternalInstance$"));
   let internalInstance = dom[key];
   if (internalInstance == null) return null;
 
@@ -543,22 +645,22 @@ export function flashPoint(coords, zoom = 15, duration = 5000) {
   var vectorLayer = new VectorLayer({
     zIndex: 1000,
     source: new Vector({
-      features: [marker]
-    })
+      features: [marker],
+    }),
   });
   window.map.addLayer(vectorLayer);
   var mstyle = new Style({
     image: new CircleStyle({
       radius: 5,
       fill: new Fill({
-        color: "#fff"
+        color: "#fff",
       }),
       stroke: new Stroke({
         color: "blue",
-        width: 2
-      })
+        width: 2,
+      }),
     }),
-    zIndex: 100
+    zIndex: 100,
   });
   marker.setStyle(mstyle);
 
@@ -588,13 +690,13 @@ function pulsate(vectorLayer, color, feature, duration, mstyle, callback) {
           radius: radius,
           snapToPixel: false,
           fill: new Fill({
-            color: "rgba(119, 170, 203, " + fillOpacity + ")"
+            color: "rgba(119, 170, 203, " + fillOpacity + ")",
           }),
           stroke: new Stroke({
             color: "rgba(119, 170, 203, " + opacity + ")",
-            width: 2 + opacity
-          })
-        })
+            width: 2 + opacity,
+          }),
+        }),
       })
     );
 
@@ -671,7 +773,7 @@ export function centerMap(coords, zoom) {
     new ol.View({
       center: newCoords,
       //extent: newExtent,
-      zoom: 13
+      zoom: 13,
     })
   );
 }
@@ -738,7 +840,7 @@ export function createTextStyle(
     placement: placement,
     maxAngle: maxAngleDegrees,
     overflow: overflow,
-    rotation: rotation
+    rotation: rotation,
   });
 
   //console.log(texts)
@@ -783,19 +885,19 @@ export function stringDivider(str, width, spaceReplacer) {
 
 export function saveToStorage(storageKey, item) {
   localStorage.setItem(storageKey, JSON.stringify(item));
-};
+}
 
 export function appendToStorage(storageKey, item, limit = undefined) {
   let items = getItemsFromStorage(storageKey);
-  if (items === undefined) items=[];
+  if (items === undefined) items = [];
   item.dateAdded = new Date().toLocaleString();
   items.unshift(item);
-  if (limit !== undefined){
+  if (limit !== undefined) {
     if (items.length >= limit) items.pop();
   }
-  
+
   localStorage.setItem(storageKey, JSON.stringify(items));
-};
+}
 
 export function getItemsFromStorage(key) {
   const storage = localStorage.getItem(key);
@@ -813,17 +915,17 @@ export function postJSON(url, data = {}, callback) {
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
     credentials: "same-origin", // include, *same-origin, omit
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
       //'Content-Type': 'application/x-www-form-urlencoded',
     },
     redirect: "follow", // manual, *follow, error
     referrer: "no-referrer", // no-referrer, *client
-    body: JSON.stringify(data) // body data type must match "Content-Type" header
+    body: JSON.stringify(data), // body data type must match "Content-Type" header
   })
-    .then(res => {
+    .then((res) => {
       return res.json();
     })
-    .then(json => {
+    .then((json) => {
       callback(json);
     });
 }
@@ -831,7 +933,7 @@ export function postJSON(url, data = {}, callback) {
 export function featureToGeoJson(feature) {
   return new GeoJSON({ dataProjection: "EPSG:3857", featureProjection: "EPSG:3857" }).writeFeature(feature, {
     dataProjection: "EPSG:3857",
-    featureProjection: "EPSG:3857"
+    featureProjection: "EPSG:3857",
   });
 }
 
@@ -842,7 +944,7 @@ export function getWKTFeature(wktString) {
   var wkt = new WKT();
   var feature = wkt.readFeature(wktString, {
     dataProjection: "EPSG:3857",
-    featureProjection: "EPSG:3857"
+    featureProjection: "EPSG:3857",
   });
   return feature;
 }
@@ -870,7 +972,7 @@ export function formatReplace(fmt, ...args) {
   }
   return fmt.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g, (m, str, index) => {
     if (str) {
-      return str.replace(/(?:{{)|(?:}})/g, m => m[0]);
+      return str.replace(/(?:{{)|(?:}})/g, (m) => m[0]);
     } else {
       if (index >= args.length) {
         throw new Error("argument index is out of range in format");
@@ -972,7 +1074,7 @@ export function bufferGeometry(geometry, distanceMeters, callback) {
   const geoJSON = getGeoJSONFromGeometry(utmNad83Geometry);
   const obj = { geoJSON: geoJSON, distance: distanceMeters, srid: "26917" };
 
-  postJSON(url, obj, result => {
+  postJSON(url, obj, (result) => {
     // REPROJECT BACK TO WEB MERCATOR
     const olGeoBuffer = getGeometryFromGeoJSON(result.geojson);
     const utmNad83GeometryBuffer = olGeoBuffer.transform("EPSG:26917", "EPSG:3857");
@@ -982,7 +1084,7 @@ export function bufferGeometry(geometry, distanceMeters, callback) {
 }
 
 export function disableKeyboardEvents(disable) {
-  if (window.map !== undefined && window.map !== null){
+  if (window.map !== undefined && window.map !== null) {
     window.map.getInteractions().forEach(function(interaction) {
       if (interaction instanceof KeyboardPan || interaction instanceof KeyboardZoom) {
         interaction.setActive(!disable);
@@ -996,7 +1098,7 @@ export function getGeometryCenter(geometry, callback) {
   const geoJSON = getGeoJSONFromGeometry(geometry);
   const obj = { geoJSON: geoJSON, srid: "3857" };
 
-  postJSON(url, obj, result => {
+  postJSON(url, obj, (result) => {
     const olGeo = getGeometryFromGeoJSON(result.geojson);
     callback(olGeo);
   });
@@ -1016,7 +1118,7 @@ function _escapeRegExp(str) {
 }
 
 export function showFeaturePopup(coord, feature) {
-  window.popup.show(coord, <FeaturePopupContent feature={feature}></FeaturePopupContent>);
+  window.popup.show(coord, <FeaturePopupContent feature={feature} />);
 }
 
 export function removeURLParameter(url, parameter) {
@@ -1041,7 +1143,7 @@ export function removeURLParameter(url, parameter) {
 function FeaturePopupContent(props) {
   return (
     <div className="sc-live-layer-popup-content">
-      {Object.entries(props.feature.getProperties()).map(row => {
+      {Object.entries(props.feature.getProperties()).map((row) => {
         if (row[0] !== "geometry" && row[0].substring(0, 1) !== "_") {
           return <InfoRow key={getUID()} value={row[1]} label={row[0]} />;
         } else return null;
@@ -1050,10 +1152,10 @@ function FeaturePopupContent(props) {
   );
 }
 
-export function removeMapControl(map,controlType) {
+export function removeMapControl(map, controlType) {
   const remove = (control) => {
     map.removeControl(control);
-  }
+  };
   map.getControls().forEach(function(control) {
     if (controlType === "zoom" && control instanceof Zoom) {
       remove(control);
@@ -1070,11 +1172,11 @@ export function removeMapControl(map,controlType) {
   }, this);
 }
 
-export function addMapControl(map,controlType) {
+export function addMapControl(map, controlType) {
   const add = (control) => {
-    if (!hasMapControl(map,controlType)) map.addControl(control);
-  }
-  switch (controlType){
+    if (!hasMapControl(map, controlType)) map.addControl(control);
+  };
+  switch (controlType) {
     case "rotate":
       add(new Rotate());
       break;
@@ -1085,26 +1187,26 @@ export function addMapControl(map,controlType) {
       add(new FullScreen());
       break;
     case "scaleLine":
-      add(new ScaleLine({minWidth: 100}));
+      add(new ScaleLine({ minWidth: 100 }));
       break;
     default:
       break;
   }
 }
-function hasMapControl(map,controlType) {
+function hasMapControl(map, controlType) {
   let returnResult = false;
   map.getControls().forEach(function(control) {
     if (controlType === "zoom" && control instanceof Zoom) {
-      returnResult =true;
+      returnResult = true;
     }
     if (controlType === "rotate" && control instanceof Rotate) {
-      returnResult =true;
+      returnResult = true;
     }
     if (controlType === "fullscreen" && control instanceof FullScreen) {
-      returnResult =true;
+      returnResult = true;
     }
     if (controlType === "scaleLine" && control instanceof ScaleLine) {
-      returnResult =true;
+      returnResult = true;
     }
   }, this);
   return returnResult;

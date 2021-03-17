@@ -23,6 +23,7 @@ class Measure extends Component {
     super(props);
 
     this.state = {
+      hideTooltips: false,
       geometryType: "",
       unitType: "distance",
       unitList: [
@@ -30,121 +31,121 @@ class Measure extends Component {
           name: "Kilometer",
           abbreviation: "km",
           type: "distance",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round((meters / 1000) * 100) / 100;
-          }
+          },
         },
         {
           name: "Miles",
           abbreviation: "mi",
           type: "distance",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round((meters / 1609.344) * 100) / 100;
-          }
+          },
         },
         {
           name: "Meter",
           abbreviation: "m",
           type: "distance",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round(meters * 100) / 100;
-          }
+          },
         },
         {
           name: "Feet",
           abbreviation: "ft",
           type: "distance",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round(meters * 3.28084 * 100) / 100;
-          }
+          },
         },
         {
           name: "Yard",
           abbreviation: "yd",
           type: "distance",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round(meters * 1.09361 * 100) / 100;
-          }
+          },
         },
         {
           name: "Inches",
           abbreviation: "in",
           type: "distance",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round(meters * 39.3701 * 100) / 100;
-          }
+          },
         },
         {
           name: "Square Meter",
           abbreviation: "sq m",
           type: "area",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round(meters * 100) / 100;
-          }
+          },
         },
         {
           name: "Hectare",
           abbreviation: "ha",
           type: "area",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round((meters / 10000) * 100) / 100;
-          }
+          },
         },
         {
           name: "Acre",
           abbreviation: "ac",
           type: "area",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round((meters / 4046.856) * 100) / 100;
-          }
+          },
         },
         {
           name: "Square Km",
           abbreviation: "sq km",
           type: "area",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round((meters / 1000000) * 100) / 100;
-          }
+          },
         },
         {
           name: "Square Feet",
           abbreviation: "sq ft",
           type: "area",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round(meters * 10.764 * 100) / 100;
-          }
+          },
         },
         {
           name: "Square Yard",
           abbreviation: "sq yard",
           type: "area",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round(meters * 1.196 * 100) / 100;
-          }
+          },
         },
         {
           name: "Square Inches",
           abbreviation: "sq in",
           type: "area",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return Math.round(meters * 1550.003 * 100) / 100;
-          }
+          },
         },
         {
           name: "Degrees",
           abbreviation: "deg",
           type: "bearing",
-          convertFunction: meters => {
+          convertFunction: (meters) => {
             return meters;
-          }
-        }
+          },
+        },
       ],
       unitMeters: -1,
       measureToolTipClass: "sc-hidden",
       measureToolTipId: helpers.getUID(),
       helpToolTipClass: "sc-hidden",
       helpToolTipId: helpers.getUID(),
-      activeTool: false
+      activeTool: false,
     };
 
     this.initialize();
@@ -157,19 +158,19 @@ class Measure extends Component {
       zIndex: 500,
       style: new Style({
         fill: new Fill({
-          color: "rgba(255, 255, 255, 0.2)"
+          color: "rgba(255, 255, 255, 0.2)",
         }),
         stroke: new Stroke({
           color: "#1346AD",
-          width: 3
+          width: 3,
         }),
         image: new CircleStyle({
           radius: 7,
           fill: new Fill({
-            color: "#ffcc33"
-          })
-        })
-      })
+            color: "#ffcc33",
+          }),
+        }),
+      }),
     });
 
     this.sketch = null;
@@ -198,7 +199,7 @@ class Measure extends Component {
     this.helpTooltip = new Overlay({
       element: this.helpTooltipElement,
       offset: [15, 0],
-      positioning: "center-left"
+      positioning: "center-left",
     });
     window.map.addOverlay(this.helpTooltip);
   };
@@ -209,13 +210,13 @@ class Measure extends Component {
     this.measureTooltip = new Overlay({
       element: this.measureTooltipElement,
       offset: [0, -15],
-      positioning: "bottom-center"
+      positioning: "bottom-center",
     });
     window.map.addOverlay(this.measureTooltip);
   };
 
   // Format length output.
-  formatLength = line => {
+  formatLength = (line) => {
     var length = getLength(line);
     var output;
     if (length > 100) {
@@ -230,9 +231,8 @@ class Measure extends Component {
     return output;
   };
 
-
   // Format area output.
-  formatArea = polygon => {
+  formatArea = (polygon) => {
     var area = getArea(polygon);
     var output;
     if (area > 10000) {
@@ -248,7 +248,7 @@ class Measure extends Component {
   };
 
   // FORMAT CIRCEL AREA
-  formatCircle = circle => {
+  formatCircle = (circle) => {
     var polygon = fromCircle(circle);
     var area = getArea(polygon);
     var output;
@@ -277,6 +277,11 @@ class Measure extends Component {
     // if (!this.state.activeTool)
     //   return;
 
+    if (window.isDrawingOrEditing) {
+      helpers.showMessage("Measure", "Active MyMaps drawing in progress.  Please finish your MyMaps and try again.", undefined, 3000);
+      this.setState({ geometryType: "clear" });
+      return;
+    }
     // DISABLE PROPERTY CLICK
     window.disableParcelClick = true;
 
@@ -299,29 +304,30 @@ class Measure extends Component {
       geometryFunction: this.state.geometryType === "Rectangle" ? createBox() : undefined,
       style: new Style({
         fill: new Fill({
-          color: "rgba(255, 255, 255, 0.2)"
+          color: "rgba(255, 255, 255, 0.2)",
         }),
         stroke: new Stroke({
           color: "#1346AD",
-          width: 3
+          width: 3,
         }),
         image: new CircleStyle({
           radius: 5,
           stroke: new Stroke({
-            color: "rgba(0, 0, 0, 0.7)"
+            color: "rgba(0, 0, 0, 0.7)",
           }),
           fill: new Fill({
-            color: "rgba(255, 255, 255, 0.2)"
-          })
-        })
+            color: "rgba(255, 255, 255, 0.2)",
+          }),
+        }),
       }),
-      maxPoints: this.state.geometryType === "Bearing" ? 2 : undefined
+      maxPoints: this.state.geometryType === "Bearing" ? 2 : undefined,
     });
 
     // DRAW START
     this.draw.on(
       "drawstart",
-      evt => {
+      (evt) => {
+        window.isMeasuring = true;
         this.vectorSource.clear();
 
         // set sketch
@@ -330,17 +336,17 @@ class Measure extends Component {
         /** @type {module:ol/coordinate~Coordinate|undefined} */
         var tooltipCoord = evt.coordinate;
 
-        this.listener = this.sketch.getGeometry().on("change", evt => {
+        this.listener = this.sketch.getGeometry().on("change", (evt) => {
           var geom = evt.target;
           var output;
           if (geom instanceof Polygon) {
             output = this.formatArea(geom);
             tooltipCoord = geom.getInteriorPoint().getCoordinates();
           } else if (geom instanceof LineString) {
-            if (this.state.geometryType === "Bearing"){
+            if (this.state.geometryType === "Bearing") {
               output = drawingHelpers.getBearing(geom.getFirstCoordinate(), geom.getLastCoordinate());
               this.setState({ unitMeters: output });
-            }else{
+            } else {
               output = this.formatLength(geom);
             }
             tooltipCoord = geom.getLastCoordinate();
@@ -350,7 +356,8 @@ class Measure extends Component {
           }
           this.measureTooltipElement.innerHTML = output;
           this.measureTooltip.setPosition(tooltipCoord);
-          this.setState({ measureToolTipClass: "sc-measure-tooltip" });
+          if (!this.state.hideTooltips) this.setState({ measureToolTipClass: "sc-measure-tooltip" });
+          else this.setState({ measureToolTipClass: "sc-hidden" });
         });
       },
       this
@@ -360,7 +367,8 @@ class Measure extends Component {
     this.draw.on(
       "drawend",
       () => {
-        //RESET TOOLTIPO
+        window.isMeasuring = false;
+        //RESET TOOLTIP
         this.measureTooltipElement.innerHTML = "";
         this.measureTooltip.setPosition([0, 0]);
         this.setState({ measureToolTipClass: "sc-hidden" });
@@ -376,7 +384,7 @@ class Measure extends Component {
   };
 
   // POINTER MOVE HANDLER
-  pointerMoveHandler = evt => {
+  pointerMoveHandler = (evt) => {
     if (evt.dragging || !this.state.activeTool) {
       this.setState({ measureToolTipClass: "sc-hidden", helpToolTipClass: "sc-hidden" });
       return;
@@ -400,7 +408,9 @@ class Measure extends Component {
 
     this.helpTooltipElement.innerHTML = helpMsg;
     this.helpTooltip.setPosition(evt.coordinate);
-    this.setState({ helpToolTipClass: "sc-measure-tooltip-help", measureToolTipClass: "sc-measure-tooltip" });
+
+    if (!this.state.hideTooltips) this.setState({ helpToolTipClass: "sc-measure-tooltip-help", measureToolTipClass: "sc-measure-tooltip" });
+    else this.setState({ helpToolTipClass: "sc-hidden", measureToolTipClass: "sc-hidden" });
   };
 
   componentWillUnmount() {
@@ -420,6 +430,7 @@ class Measure extends Component {
     window.map.removeLayer(this.vectorLayer);
 
     window.disableParcelClick = false;
+    window.isMeasuring = false;
   }
 
   onClose = () => {
@@ -437,22 +448,29 @@ class Measure extends Component {
     this.setState({ measureToolTipClass: "sc-hidden", helpToolTipClass: "sc-hidden", activeTool: false });
 
     window.disableParcelClick = false;
+    window.isMeasuring = false;
   };
 
   onGeometryButtonClick = (type, unitType) => {
     if (type === "Clear") {
       this.reset();
       this.setState({ geometryType: type, unitType: unitType });
+      window.isMeasuring = false;
     } else {
       this.setState({ geometryType: type, unitType: unitType }, () => {
         this.addInteraction();
+        window.isMeasuring = true;
       });
     }
   };
 
+  onTooltipCheckboxChange = (evt) => {
+    this.setState({ hideTooltips: evt.target.checked });
+  };
+
   render() {
     return (
-      <PanelComponent onClose={this.onClose} name={this.props.name} type="tools">
+      <PanelComponent onClose={this.onClose} name={this.props.name} helpLink={this.props.helpLink} type="tools">
         <div className="simcoe-measure-container">
           <div style={{ padding: "10px", fontSize: "11pt" }}>
             Please select the type of measurements you wish to perform from the toolbar below. Use the line tools for distances and polygon tools for area.
@@ -460,6 +478,11 @@ class Measure extends Component {
 
           {/* BUTTON BAR */}
           <div className="sc-measure-title">Measure Tools</div>
+          <div className="sc-measure-tooltip-message-container">
+            {"Hide Tooltips"}
+            <input style={{ position: "relative", top: "2px" }} type="checkbox" onChange={this.onTooltipCheckboxChange} value={this.state.hideTooltips} />
+          </div>
+
           <div key={helpers.getUID()} className="sc-measure-button-bar">
             <div className={this.state.geometryType === "LineString" ? "sc-measure-button-container active" : "sc-measure-button-container"}>
               <button
@@ -469,7 +492,7 @@ class Measure extends Component {
                   this.onGeometryButtonClick("LineString", "distance");
                 }}
               >
-                <img src={images["polyline.png"]} alt="line"></img>
+                <img src={images["polyline.png"]} alt="line" />
               </button>
             </div>
             <div className={this.state.geometryType === "Polygon" ? "sc-measure-button-container active" : "sc-measure-button-container"}>
@@ -480,7 +503,7 @@ class Measure extends Component {
                   this.onGeometryButtonClick("Polygon", "area");
                 }}
               >
-                <img src={images["polygon.png"]} alt="polygon"></img>
+                <img src={images["polygon.png"]} alt="polygon" />
               </button>
             </div>
             <div className={this.state.geometryType === "Circle" ? "sc-measure-button-container active" : "sc-measure-button-container"}>
@@ -491,7 +514,7 @@ class Measure extends Component {
                   this.onGeometryButtonClick("Circle", "area");
                 }}
               >
-                <img src={images["circle.png"]} alt="circle"></img>
+                <img src={images["circle.png"]} alt="circle" />
               </button>
             </div>
             <div className={this.state.geometryType === "Rectangle" ? "sc-measure-button-container active" : "sc-measure-button-container"}>
@@ -502,7 +525,7 @@ class Measure extends Component {
                   this.onGeometryButtonClick("Rectangle", "area");
                 }}
               >
-                <img src={images["rectangle.png"]} alt="rectangle"></img>
+                <img src={images["rectangle.png"]} alt="rectangle" />
               </button>
             </div>
             <div className={this.state.geometryType === "Bearing" ? "sc-measure-button-container active" : "sc-measure-button-container"}>
@@ -513,7 +536,7 @@ class Measure extends Component {
                   this.onGeometryButtonClick("Bearing", "bearing");
                 }}
               >
-                <img src={images["compass.png"]} alt="compass"></img>
+                <img src={images["compass.png"]} alt="compass" />
               </button>
             </div>
 
@@ -525,7 +548,7 @@ class Measure extends Component {
                   this.onGeometryButtonClick("Clear");
                 }}
               >
-                <img src={images["none.png"]} alt="clear"></img>
+                <img src={images["none.png"]} alt="clear" />
               </button>
             </div>
           </div>
@@ -539,13 +562,13 @@ class Measure extends Component {
 
           {/* RESULTS */}
           <div className={this.state.geometryType === "" || this.state.geometryType === "Clear" ? "sc-hidden" : "sc-measure-results-container"}>
-            {this.state.unitList.map(unit => {
+            {this.state.unitList.map((unit) => {
               return <MeasureResult key={helpers.getUID()} unitDetails={unit} unitType={this.state.unitType} unitMeters={this.state.unitMeters} />;
             })}
           </div>
 
-          <div id={this.state.helpToolTipId} className={this.state.helpToolTipClass}></div>
-          <div id={this.state.measureToolTipId} className={this.state.measureToolTipClass}></div>
+          <div id={this.state.helpToolTipId} className={this.state.helpToolTipClass} />
+          <div id={this.state.measureToolTipId} className={this.state.measureToolTipClass} />
         </div>
       </PanelComponent>
     );

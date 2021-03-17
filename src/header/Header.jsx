@@ -10,10 +10,18 @@ import mainConfig from "../config.json";
 
 const feedbackTemplate = (url, xmin, xmax, ymin, ymax, centerx, centery, scale) => `${url}/?xmin=${xmin}&xmax=${xmax}&ymin=${ymin}&ymax=${ymax}&centerx=${centerx}&centery=${centery}&scale=${scale}`;
 class Header extends Component {
-  state = {};
-  componentDidMount(){
-    window.emitter.emit("headerLoaded");  
+  constructor(props) {
+    super(props);
+    this.state = {};
+
+    // LISTEN FOR FEEDBACK
+    window.emitter.addListener("feedback", () => this.onFeedbackClick());
   }
+
+  componentDidMount() {
+    window.emitter.emit("headerLoaded");
+  }
+
   burgerButtonHandler() {
     // EMIT A CHANGE IN THE SIDEBAR (IN OR OUT)
     if (window.sidebarOpen) window.emitter.emit("setSidebarVisiblity", "CLOSE");
@@ -22,7 +30,7 @@ class Header extends Component {
     helpers.addAppStat("Burger Button", "Click");
   }
 
-  onDotMenuClick = evt => {
+  onDotMenuClick = (evt) => {
     var evtClone = Object.assign({}, evt);
     const menu = (
       <Portal>
@@ -38,7 +46,7 @@ class Header extends Component {
     helpers.addAppStat("Header Dot Menu", "Click");
   };
 
-  onMenuItemClick = value => {
+  onMenuItemClick = (value) => {
     helpers.showMessage("Coming Soon", "Coming Soon...");
     helpers.addAppStat("Header Dot Menu", value);
   };
@@ -64,11 +72,11 @@ class Header extends Component {
     const imageName = mainConfig.headerLogoImageName;
     return (
       <div className="header">
-        {/*<div
+        <div
           id="sc-header-burger-button"
           onClick={this.burgerButtonHandler}
           tabIndex="2"
-          onKeyPress={evt => {
+          onKeyPress={(evt) => {
             if (evt.key === "Enter") {
               this.burgerButtonHandler();
             }
@@ -76,7 +84,7 @@ class Header extends Component {
         >
           <img src={require("./images/burger-button.png")} alt="Header Logo" />
         </div>
-        */}
+
         <div id="sc-header-bar-button">
           <img src={require("./images/bar-button.png")} alt="Header Logo" />
         </div>
@@ -86,15 +94,9 @@ class Header extends Component {
         <div id="sc-header-search-container">
           <Search />
         </div>
-        <div className="sc-header-feedback-container" >
-          <div className="sc-header-help-container" >
-              <div className="sc-header-help-btn" onClick={() => helpers.showURLWindow(mainConfig.helpUrl, false, "full")}>?</div>
-          </div>
-        </div>
-        
-{/*
-        <div className="sc-header-dot-menu-container" onClick={this.onDotMenuClick}><img className="sc-header-dot-menu-img" src={images['vertical-dot-menu.png']} alt="dots"></img></div>
-*/}
+        <div className="sc-header-feedback-container" title="Feedback" onClick={this.onFeedbackClick}>
+          <img style={{ marginTop: "5px" }} src={require("./images/feedback.png")} alt="feedback" />
+          Feedback
         </div>
     );
   }

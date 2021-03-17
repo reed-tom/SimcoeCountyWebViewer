@@ -1,42 +1,57 @@
 import React, { Component } from "react";
 import "./UrlWindow.css";
 import * as helpers from "./helpers";
+import * as mainConfig from "../config.json";
 
 class URLWindow extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      hide: false
+      hide: false,
     };
 
-    this.storageKeyWhatsNew = "New Feature Notice";
+    this.storageKey = mainConfig.storageKeys.URLDontShowAgain;
   }
 
-  onCloseClick = value => {
+  onCloseClick = (value) => {
     this.setState({ hide: true });
   };
 
   onPopoutClick = () => {
     window.open(this.props.url, "_blank");
   };
+
+  componentWillUnmount() {
+    this.sidebarEmitter.remove();
+    document.removeEventListener("keydown", this.escFunction, false);
+  }
+
   componentDidMount() {
     if (this.props.honorDontShow) {
       const saved = this.getStorage();
-      if (saved.includes(this.props.url)) this.setState({ hide: true });
+      if (saved.find((item) => item.url.toLowerCase() === this.props.url.toLowerCase())) this.setState({ hide: true });
     }
 
     document.addEventListener("keydown", this.escFunction, false);
 
     // LISTEN FOR SIDEPANEL CHANGES
-    window.emitter.addListener("sidebarChanged", isSidebarOpen => this.sidebarChanged(isSidebarOpen));
+    this.sidebarEmitter = window.emitter.addListener("sidebarChanged", (isSidebarOpen) => this.sidebarChanged(isSidebarOpen));
   }
 
-  sidebarChanged = isSidebarOpen => {
+  isDontShow = () => {
+    if (this.props.honorDontShow) {
+      const saved = this.getStorage();
+      if (saved.includes(this.props.url)) return true;
+      else return false;
+    }
+  };
+
+  sidebarChanged = (isSidebarOpen) => {
     this.forceUpdate();
   };
 
-  escFunction = event => {
+  escFunction = (event) => {
     if (event.keyCode === 27) {
       this.setState({ hide: true });
     }
@@ -46,21 +61,32 @@ class URLWindow extends Component {
     this.saveToStorage();
   };
 
-
   saveToStorage = () => {
-    helpers.appendToStorage(this.storageKeyWhatsNew,this.props.url);
+    let item = {url:this.props.url, dateAdded: new Date().toLocaleString()};
+    helpers.appendToStorage(this.storageKey, item);
     this.setState({ hide: true });
-    
   };
 
- 
+  // GET STORAGE
+  getStorage() {
+    const storage = localStorage.getItem(this.storageKey);
+    if (storage === null) return [];
+
+    const data = JSON.parse(storage);
+    return data;
+  }
+
   render() {
-    //className={this.state.hide ? "sc-hidden" :"sc-url-window-map-container"}
+    // DONT RENDER IF WERE NOT SHOWING, OTHERWISE ALL DATA/IMAGES FROM URL LINK WILL DOWNLOAD
+    if (this.isDontShow()) return <div />;
+
     let className = "";
     if (this.state.hide) className = "sc-hidden";
     else if (this.props.mode === "full") className = "full";
     else if (!window.sidebarOpen) className = "full";
-    //const className = this.state.hide ? "sc-hidden" : this.props.mode === "full" ? "full" : ""
+
+    let hideScrollClassName = "";
+    if (this.props.hideScroll) hideScrollClassName = "sc-url-window-content-no-scroll";
     return (
       <div id="sc-url-window-container" className={className}>
         <div className="sc-url-window-header">
@@ -76,8 +102,8 @@ class URLWindow extends Component {
             </button>
           </div>
         </div>
-        <div id="sc-url-window-content" className={this.props.showFooter ? "sc-url-window-content with-footer" : "sc-url-window-content"}>
-          <iframe className="sc-url-window-iframe" src={this.props.url} frameBorder="0" title="Information" />
+        <div id="sc-url-window-content" className={this.props.showFooter ? "sc-url-window-content with-footer " + hideScrollClassName : "sc-url-window-content " + hideScrollClassName}>
+          <iframe id="sc-url-window-iframe" className="sc-url-window-iframe" src={this.props.url} frameBorder="0" title="Information" />
         </div>
         <div className={this.props.showFooter ? "sc-url-window-footer" : "sc-hidden"}>
           <button className="sc-button" onClick={this.onCloseClick}>

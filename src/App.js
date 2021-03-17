@@ -10,8 +10,10 @@ import LoadingScreen from "./helpers/LoadingScreen.jsx";
 import ReactGA from "react-ga";
 import packageJson from '../package.json';
 
-ReactGA.initialize("UA-165888448-1");
-ReactGA.pageview(window.location.pathname + window.location.search);
+if (mainConfig.googleAnalyticsID !== undefined && mainConfig.googleAnalyticsID !== "") {
+  ReactGA.initialize(mainConfig.googleAnalyticsID);
+  ReactGA.pageview(window.location.pathname + window.location.search);
+}
 
 class App extends Component {
   constructor(props) {
@@ -48,8 +50,9 @@ class App extends Component {
         <div id="portal-root" />
         <LoadingScreen visible={this.state.mapLoading || this.state.sidebarLoading || this.state.headerLoading} backgroundColor={"#3498db"} />
         <Header />
-        <Sidebar />
+        <Sidebar mapLoading={this.state.mapLoading} headerLoading={this.state.headerLoading} />
         <SCMap />
+        {/* <AttributeTable></AttributeTable> */}
       </div>
     );
   }

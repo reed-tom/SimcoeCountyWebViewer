@@ -16,17 +16,17 @@ class MyMapsAdvanced extends Component {
       open: false,
       editOn: false,
       editOption: "vertices",
-      inputText: ""
+      inputText: "",
     };
   }
 
-  onSwitchChange = editOn => {
+  onSwitchChange = (editOn) => {
     this.setState({ editOn });
-    helpers.addAppStat("Edit Features Switch", editOn);
+    helpers.addAppStat("Edit Features Switch", "Click");
     this.props.onEditFeatures(editOn, this.state.editOption);
   };
 
-  onEditOption = evt => {
+  onEditOption = (evt) => {
     this.setState({ editOption: evt.currentTarget.value });
     this.props.onEditFeatures(this.state.editOn, evt.currentTarget.value);
   };
@@ -47,6 +47,19 @@ class MyMapsAdvanced extends Component {
     });
   };
 
+  onShare = () => {
+    if (this.state.inputText.length !== 36) {
+      helpers.showMessage("MyMaps Share", "Invalid ID was entered.", helpers.messageColors.red);
+      return;
+    }
+    let currentUrl = `${window.location.href.split("?")[0]}?MY_MAPS_ID=${this.state.inputText}`;
+    copy(currentUrl);
+    helpers.showMessage("MyMaps Share", "MyMaps link has been saved to clipboard.",helpers.messageColors.green, 5000);
+
+    // APP STATS
+    helpers.addAppStat("MyMaps", "Share");
+  };
+
   onSave = () => {
     this.setState({ copied: true });
     drawingHelpers.exportMyMaps(result => {
@@ -55,9 +68,12 @@ class MyMapsAdvanced extends Component {
       this.setState({ inputText: result.id });
       copy(result.id);
     });
+
+    // APP STATS
+    helpers.addAppStat("MyMaps", "Save");
   };
 
-  onInputChange = evt => {
+  onInputChange = (evt) => {
     this.setState({ inputText: evt.target.value });
   };
 
@@ -85,12 +101,16 @@ class MyMapsAdvanced extends Component {
                   // value={this.state.selectedGroup}
                   placeholder="6a8cf8c6-b3a0-11e9-9d64-005056b2f523"
                 /> */}
+                <br />
                 <button className="sc-button sc-mymaps-advanced-import-button" onClick={this.onImport}>
                   Import
                 </button>
 
                 <button className="sc-button sc-mymaps-advanced-import-button" onClick={this.onSave}>
                   Save
+                </button>
+                <button className="sc-button sc-mymaps-advanced-import-button" onClick={this.onShare}>
+                  Share
                 </button>
               </div>
             </div>
@@ -114,32 +134,8 @@ class MyMapsAdvanced extends Component {
           </div>
         </Collapsible>
       </div>
-
-      // <div className="sc-mymaps-advanced">
-      //   <div>Advanced</div>
-      //   <MyMapsFooter onMenuItemClick={this.props.onMenuItemClick} onDeleteAllClick={this.props.onDeleteAllClick} />
-      // </div>
     );
   }
 }
 
 export default MyMapsAdvanced;
-
-// const selectStyles = {
-//   control: provided => ({
-//     ...provided,
-//     minHeight: "30px"
-//   }),
-//   indicatorsContainer: provided => ({
-//     ...provided,
-//     height: "30px"
-//   }),
-//   clearIndicator: provided => ({
-//     ...provided,
-//     padding: "5px"
-//   }),
-//   dropdownIndicator: provided => ({
-//     ...provided,
-//     padding: "5px"
-//   })
-// };

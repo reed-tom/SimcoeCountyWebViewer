@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import "./MenuButton.css";
 import * as helpers from "../helpers/helpers";
 import mainConfig from "../config.json";
-import htmlToImage from "html-to-image";
-import { saveAs } from 'file-saver';
+import * as htmlToImage from "html-to-image";
+import { saveAs } from "file-saver";
 
 const feedbackTemplate = (xmin, xmax, ymin, ymax, centerx, centery, scale) =>
   `${mainConfig.feedbackUrl}/?xmin=${xmin}&xmax=${xmax}&ymin=${ymin}&ymax=${ymax}&centerx=${centerx}&centery=${centery}&scale=${scale}`;
@@ -53,15 +53,17 @@ class MenuButton extends Component {
   // CUSTOM ENTRIES, COMMENT OUT IF YOU DON"T WANT IT
   getOthers = () => {
     let itemList = [];
-    
+    itemList.push(<MenuItem onClick={() => helpers.showURLWindow(mainConfig.whatsNewUrl, true, "full", false, true)} key={helpers.getUID()} name={"What's New"} iconClass={"sc-menu-terms-icon"} />);
     itemList.push(<MenuItem key={helpers.getUID()} name={"Feedback"} iconClass={"sc-menu-feedback-icon"} onClick={this.onFeedbackClick} />);
-    itemList.push(<MenuItem onClick={() => helpers.showURLWindow(mainConfig.helpUrl, false, "full")} key={helpers.getUID()} name={"Help"} iconClass={"sc-menu-help-icon"} />);
-    itemList.push(<MenuItem onClick={() => helpers.showURLWindow(mainConfig.termsUrl, false, "full")} key={helpers.getUID()} name={"Terms and Conditions"} iconClass={"sc-menu-terms-icon"} />);
+    itemList.push(<MenuItem onClick={this.onScreenshotClick} key={helpers.getUID()} name={"Take a Screenshot"} iconClass={"sc-menu-screenshot-icon"} />);
+    itemList.push(<MenuItem key={helpers.getUID()} name={"Map Legend"} iconClass={"sc-menu-legend-icon"} onClick={() => window.emitter.emit("openLegend", null)} />);
+    itemList.push(<MenuItem onClick={() => helpers.showURLWindow(mainConfig.helpUrl, false, "full", false, true)} key={helpers.getUID()} name={"Help"} iconClass={"sc-menu-help-icon"} />);
+    itemList.push(<MenuItem onClick={() => helpers.showURLWindow(mainConfig.termsUrl, false, "full", false, true)} key={helpers.getUID()} name={"Terms and Conditions"} iconClass={"sc-menu-terms-icon"} />);
     return itemList;
   };
 
   getMyMaps = () => {
-    return <MenuItem onClick={() => this.itemClick("mymaps", "mymaps")} key={helpers.getUID()} name={"Draw"} iconClass={"sc-menu-mymaps-icon"} />;
+    return <MenuItem onClick={() => this.itemClick("mymaps", "mymaps")} key={helpers.getUID()} name={"My Maps"} iconClass={"sc-menu-mymaps-icon"} />;
   };
 
   itemClick = (name, type) => {
@@ -124,10 +126,12 @@ class MenuButton extends Component {
             {(this.props.showLabel!==undefined&&!this.props.showLabel)?<span style={{ display: "none" }}>&nbsp;</span> : <span style={{ pointerEvents: "none" }}>More</span>}
           </button>
         </div>
-
-      
         <div id="sc-menu-button-list-container" className={menuListClassName}>
-          <div className="sc-menu-list-item-heading">TOOLS</div>
+          <div className="sc-menu-list-item-heading" style={{ paddingTop: "0px" }}>
+            MAP THEMES
+          </div>
+          {this.getThemes()}
+          <div className="sc-menu-list-item-heading">MAP TOOLS</div>
           {this.getTools()}
           <div className="sc-menu-list-item-heading">OTHER</div>
           {this.getOthers()}

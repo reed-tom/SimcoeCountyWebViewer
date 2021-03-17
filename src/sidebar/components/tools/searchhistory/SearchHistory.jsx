@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./SearchHistory.css";
 import * as helpers from "../../../../helpers/helpers";
 import PanelComponent from "../../../PanelComponent";
-const storageKey = "Search History";
+const storageKey = "searchHistory";
 class ToolComponent extends Component {
    
   constructor(props) {
@@ -35,7 +35,7 @@ class ToolComponent extends Component {
     helpers.saveToStorage(storageKey, this.state.items);
   };
 
-  onMoreInfoClick = item => {
+  onMoreInfoClick = (item) => {
     window.open(item.ReportURL, "_blank");
   };
 
@@ -47,7 +47,7 @@ class ToolComponent extends Component {
     helpers.zoomToFeature(helpers.getFeatureFromGeoJSON(item.geojson));
   };
 
-  onRemoveClick = item => {
+  onRemoveClick = (item) => {
     this.setState(
       {
         items: this.state.items.filter(function(itemInfo) {
@@ -69,12 +69,12 @@ class ToolComponent extends Component {
 
   render() {
     return (
-      <PanelComponent onClose={this.onClose} name={this.props.name} type="tools">
+      <PanelComponent onClose={this.onClose} name={this.props.name} helpLink={this.props.helpLink} type="tools">
         <div className="sc-tool-search-history-main-container">
           <div style={{ fontSize: "9pt" }}>Below is a list of your most recent searched items. These items will be added automatically after each search you do for future reference.</div>
           <div className={this.state.items.length === 0 ? "sc-tool-search-history-no-results" : "sc-hidden"}>Your search history is currently empty. Once you search an item, it will appear here.</div>
           <div className={this.state.items.length > 0 ? "sc-tool-search-history-results" : "sc-hidden"}>
-            {this.state.items.map(item => {
+            {this.state.items.map((item) => {
               return <SearchItem key={helpers.getUID()} item={item} onMoreInfoClick={this.onMoreInfoClick} onReplayClick={this.onReplayClick} onRemoveClick={this.onRemoveClick} onZoomClick={this.onZoomClick}></SearchItem>;
             })}
           </div>
@@ -91,18 +91,21 @@ class ToolComponent extends Component {
 
 export default ToolComponent;
 
-const SearchItem = props => {
+const SearchItem = (props) => {
   return (
     <div className="sc-container sc-tool-search-history-item-container">
       <div className="sc-tool-search-history-image">
-        <img src={images["map-marker-light-blue.png"]} alt="Map Marker"></img>
+        <img src={images["map-marker-light-blue.png"]} alt="Map Marker" />
       </div>
       <div className="sc-tool-search-history-details-name">{props.item.name}</div>
       <div className="sc-tool-search-history-details-muni">{"- (" + props.item.type + ")"}</div>
       <div className="sc-tool-search-history-details-date">{"Added: " + props.item.dateAdded}</div>
       {/* <div className="sc-tool-search-history-divider"></div> */}
-      <div className="sc-tool-search-history-background"></div>
-      <div className={props.item.Type === "Address" || props.item.Type === "Assessment Parcel" ? "sc-fakeLink sc-tool-search-history-button-info" : "sc-hidden"} onClick={() => props.onMoreInfoClick(props.item)}>
+      <div className="sc-tool-search-history-background" />
+      <div
+        className={props.item.Type === "Address" || props.item.Type === "Assessment Parcel" ? "sc-fakeLink sc-tool-search-history-button-info" : "sc-hidden"}
+        onClick={() => props.onMoreInfoClick(props.item)}
+      >
         More Information
       </div>
       <div className="sc-fakeLink sc-tool-search-history-button-replay" onClick={() => props.onReplayClick(props.item)}>

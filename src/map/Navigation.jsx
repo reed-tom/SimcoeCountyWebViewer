@@ -18,10 +18,10 @@ class Navigation extends Component {
     };
 
     // LISTEN FOR SIDEPANEL CHANGES
-    window.emitter.addListener("sidebarChanged", isSidebarOpen => this.sidebarChanged(isSidebarOpen));
+    window.emitter.addListener("sidebarChanged", (isSidebarOpen) => this.sidebarChanged(isSidebarOpen));
 
     // LISTEN FOR CONTROL VISIBILITY CHANGES
-    window.emitter.addListener("mapControlsChanged", (control, visible) => this.controlStateChange(control,visible));
+    window.emitter.addListener("mapControlsChanged", (control, visible) => this.controlStateChange(control, visible));
   }
 
   componentDidMount(){
@@ -53,9 +53,9 @@ class Navigation extends Component {
     let defaultZoom = mainConfig.defaultZoom;
     const defaultStorage = sessionStorage.getItem(storageMapDefaultsKey);
     if (defaultStorage !== null) {
-      const detaults = JSON.parse(defaultStorage);
-      if (detaults.zoom !== undefined) defaultZoom = detaults.zoom;
-      if (detaults.center !== undefined) centerCoords = detaults.center;
+      const defaults = JSON.parse(defaultStorage);
+      if (defaults.zoom !== undefined) defaultZoom = defaults.zoom;
+      if (defaults.center !== undefined) centerCoords = defaults.center;
     }
     window.map.getView().animate({ center: centerCoords, zoom: defaultZoom });
   }
@@ -82,7 +82,7 @@ class Navigation extends Component {
         const coords = fromLonLat([pos.coords.longitude, pos.coords.latitude]);
         helpers.flashPoint(coords);
       },
-      err => {
+      (err) => {
         helpers.showMessage("Location", "Getting your location failed: " + err.message);
       },
       options
@@ -101,12 +101,12 @@ class Navigation extends Component {
     }
   }
   controlStateChange(control, state) {
-    switch (control){
+    switch (control) {
       case "fullExtent":
-        this.setState({showZoomExtent:state});
+        this.setState({ showZoomExtent: state });
         break;
       case "zoomToCurrentLocation":
-        this.setState({showCurrentLocation:state});
+        this.setState({ showCurrentLocation: state });
         break;
       case "identifyToggle":
         this.setState({showIdentifyFeature:state});

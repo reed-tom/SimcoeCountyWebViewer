@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import "./Settings.css";
-import {ClearLocalStorageButton} from "./SettingsComponents.jsx";
+import { ClearLocalStorageButton } from "./SettingsComponents.jsx";
 import * as helpers from "../../../../helpers/helpers";
 import PanelComponent from "../../../PanelComponent";
+import settingsConfig from "./config.json";
 
 class Settings extends Component {
   constructor(props) {
@@ -21,7 +22,6 @@ class Settings extends Component {
     };
     this.storageKey = "Settings";
     this.storageKeyMapControls = "Map Control Settings";
-    
   }
 
   componentDidMount() {
@@ -60,8 +60,6 @@ class Settings extends Component {
     helpers.glowContainer(container);
   }
 
-  
- 
   componentWillUnmount() {
     window.emitter.addListener("mapLoaded", () => this.onMapLoad());
   }
@@ -183,33 +181,67 @@ class Settings extends Component {
     helpers.saveToStorage(this.storageKeyMapControls,window.mapControls)
   }
   
+  applyControlSettings = () => {
+    let map = window.map;
+    if (this.state.controlRotate) {
+      helpers.addMapControl(map, "rotate");
+    } else {
+      helpers.removeMapControl(map, "rotate");
+    }
+    if (this.state.controlFullScreen) {
+      helpers.addMapControl(map, "fullscreen");
+    } else {
+      helpers.removeMapControl(map, "fullscreen");
+    }
+    if (this.state.controlZoomInOut) {
+      helpers.addMapControl(map, "zoom");
+    } else {
+      helpers.removeMapControl(map, "zoom");
+    }
+    if (this.state.controlScaleLine) {
+      helpers.addMapControl(map, "scaleLine");
+    } else {
+      helpers.removeMapControl(map, "scaleLine");
+    }
+
+    //EMIT CHANGE NOTICE FOR ITEMS IN THE NAVIGATION PANEL
+    window.emitter.emit("mapControlsChanged", "fullExtent", this.state.controlZoomExtent);
+    window.emitter.emit("mapControlsChanged", "zoomToCurrentLocation", this.state.controlCurrentLocation);
+    //EMIT CHANGE NOTICE FOR ITEMS IN THE FOOTER PANEL
+    window.emitter.emit("mapControlsChanged", "scale", this.state.controlScale);
+    //EMIT CHANGE NOTICE FOR BASEMAP SWITCHER
+    window.emitter.emit("mapControlsChanged", "basemap", this.state.controlBasemap);
+    //EMIT CHANGE NOTICE FOR ADDITIONAL ITEMS
+    window.emitter.emit("mapControlsChanged", "fullscreen", this.state.controlFullScreen);
+    helpers.saveToStorage(this.storageKeyMapControls, window.mapControls);
+  };
+
   clearLocalData = (key) => {
-    if (key === "ALL"){
+    if (key === "ALL") {
       localStorage.clear();
       helpers.showMessage("Local Data Cleared", "Your local data has been cleared. Page will now reload.");
-      setTimeout(() => {window.location.reload();}, 2000);
-    }else{
-      localStorage.removeItem(key)
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } else {
+      localStorage.removeItem(key);
       helpers.showMessage("Local Data Removed", "Your local data has been cleared. You may need to reload your page to see any changes.");
     }
-    
-  }
-
+  };
 
   render() {
     return (
-      <PanelComponent onClose={this.props.onClose} name={this.props.name} type="tools">
+      <PanelComponent onClose={this.props.onClose} name={this.props.name} helpLink={this.props.helpLink} type="tools">
         <div className="sc-settings-container">
           <div className="sc-container">
-            <div className="sc-description">
-              Set your personal preferences. 
-            </div>
-            <div className="sc-settings-divider"></div>           
-            <div className="sc-title sc-settings-title">VISIBLE CONTROLS</div>
-            <div className="sc-container">
-              <div className="sc-settings-row sc-arrow">
-                <label>Rotate:</label>
-                <span>
+            <div className="sc-description">Set your personal preferences.</div>
+            <div className="sc-settings-divider" />
+            <div className={settingsConfig.showControlSettings ? "" : "sc-hidden"}>
+              <div className="sc-title sc-settings-title">VISIBLE CONTROLS</div>
+              <div className="sc-container">
+                <div className="sc-settings-row sc-arrow">
+                  <label>Rotate:</label>
+                  <span>
                     <input
                         name="controlRotate"
                         type="checkbox"
@@ -317,33 +349,30 @@ class Settings extends Component {
                         onChange={this.onBasemapControl} />
                 </span>
               </div>
-              
+          
+                <div className="sc-float-right">
+                  <button name="applyControlSettings" className="sc-button" onClick={this.applyControlSettings}>
+                    Save/Apply
+                  </button>
+                </div>
+              </div>
             </div>
-            <div className="sc-settings-divider"></div>           
+
+            <div className="sc-settings-divider" />
             <div className="sc-title sc-settings-title">LOCAL STORAGE</div>
             <div className="sc-container">
               <div className="sc-settings-row sc-arrow">
-                <button 
-                  name="clearLocalStorage" 
-                  title="Clear all cached settings and reload the page." 
-                  className="sc-button" 
-                  onClick={() => this.clearLocalData("ALL")}
-                >
+                <button name="clearLocalStorage" title="Clear all cached settings and reload the page." className="sc-button" onClick={() => this.clearLocalData("ALL")}>
                   Clear All Saved Data
                 </button>
               </div>
-              <div className="sc-settings-divider"></div>
-              { Object.keys(localStorage).map((key) => (
-                  <ClearLocalStorageButton
-                    key={helpers.getUID()}
-                    storageKey={key}
-                    clearLocalData= {this.clearLocalData}
-                  />
-                  
+              <div className="sc-settings-divider" />
+              {Object.keys(localStorage).map((key) => (
+                <ClearLocalStorageButton key={helpers.getUID()} storageKey={key} clearLocalData={this.clearLocalData} />
               ))}
             </div>
-            
-            <div className="sc-container sc-settings-floatbottom"></div>
+
+            <div className="sc-container sc-settings-floatbottom" />
           </div>
         </div>
       </PanelComponent>
@@ -352,6 +381,3 @@ class Settings extends Component {
 }
 
 export default Settings;
-
-
-

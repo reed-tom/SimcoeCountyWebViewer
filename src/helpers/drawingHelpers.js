@@ -5,14 +5,13 @@ import LineString from "ol/geom/LineString.js";
 import * as helpers from "./helpers";
 import mainConfig from "../config.json";
 
-
 // GET LAYER BY NAME FROM LAYER
 export function getLayerByName(layerName) {
-  const layers =  window.map.getLayers();
+  const layers = window.map.getLayers();
   let returnLayer = undefined;
   if (layers.array_.length > 0) {
-    layers.forEach(layer => {
-      if (returnLayer === undefined){
+    layers.forEach((layer) => {
+      if (returnLayer === undefined) {
         if (layerName === layer.getProperties().name) returnLayer = layer;
       }
     });
@@ -20,16 +19,15 @@ export function getLayerByName(layerName) {
   return returnLayer;
 }
 
-
 // GET LAYER BY NAME FROM LAYER
 export function getFeatureByLayerNameAndId(layerName, id) {
   let feature = null;
-  window.map.getLayers().forEach(layer => {
+  window.map.getLayers().forEach((layer) => {
     if (layer.getProperties().name === layerName) {
       layer
         .getSource()
         .getFeatures()
-        .forEach(feat => {
+        .forEach((feat) => {
           if (feat.getProperties().id === id) feature = feat;
           return;
         });
@@ -39,17 +37,16 @@ export function getFeatureByLayerNameAndId(layerName, id) {
   return feature;
 }
 
-
 // GET FEATURE FROM MYMAPS LAYER
 export function getFeatureById(id) {
   const drawingLayerName = "local:myMaps";
   let feature = null;
-  window.map.getLayers().forEach(layer => {
+  window.map.getLayers().forEach((layer) => {
     if (layer.getProperties().name === drawingLayerName) {
       layer
         .getSource()
         .getFeatures()
-        .forEach(feat => {
+        .forEach((feat) => {
           if (feat.getProperties().id === id) feature = feat;
           return;
         });
@@ -66,7 +63,7 @@ export function getStyleFromJSON(styleJSON, pointType) {
   let fill = null;
   if (styleJSON.fill_ !== null) {
     fill = new Fill({
-      color: styleJSON.fill_.color_
+      color: styleJSON.fill_.color_,
     });
   }
 
@@ -76,7 +73,7 @@ export function getStyleFromJSON(styleJSON, pointType) {
     stroke = new Stroke({
       color: styleJSON.stroke_.color_,
       lineDash: styleJSON.stroke_.lineDash_,
-      width: styleJSON.stroke_.width_
+      width: styleJSON.stroke_.width_,
     });
   }
 
@@ -87,14 +84,14 @@ export function getStyleFromJSON(styleJSON, pointType) {
     const imageStroke = new Stroke({
       color: styleJSON.image_.stroke_ === undefined ? [255, 0, 0, 0.7] : styleJSON.image_.stroke_.color_,
       width: styleJSON.image_.stroke_ === undefined ? 1 : styleJSON.image_.stroke_.width_,
-      lineDash: styleJSON.image_.stroke_ === undefined ? null : styleJSON.image_.stroke_.lineDash_
+      lineDash: styleJSON.image_.stroke_ === undefined ? null : styleJSON.image_.stroke_.lineDash_,
     });
 
     if (pointType === undefined || pointType === "circle") {
       image = new CircleStyle({
         radius: styleJSON.image_.radius_,
         stroke: imageStroke,
-        fill: imageFill
+        fill: imageFill,
       });
     } else if (pointType === "square") {
       image = new RegularShape({
@@ -103,7 +100,7 @@ export function getStyleFromJSON(styleJSON, pointType) {
         points: 4,
         radius: styleJSON.image_.radius_,
         angle: Math.PI / 4,
-        rotation: styleJSON.image_.rotation_
+        rotation: styleJSON.image_.rotation_,
       });
     } else if (pointType === "triangle") {
       image = new RegularShape({
@@ -113,7 +110,7 @@ export function getStyleFromJSON(styleJSON, pointType) {
         radius: styleJSON.image_.radius_,
         //rotation: Math.PI / 4,
         rotation: styleJSON.image_.rotation_,
-        angle: 0
+        angle: 0,
       });
     } else if (pointType === "star") {
       image = new RegularShape({
@@ -123,7 +120,7 @@ export function getStyleFromJSON(styleJSON, pointType) {
         radius: styleJSON.image_.radius_,
         radius2: 4,
         angle: 0,
-        rotation: styleJSON.image_.rotation_
+        rotation: styleJSON.image_.rotation_,
       });
     } else if (pointType === "cross") {
       image = new RegularShape({
@@ -133,7 +130,7 @@ export function getStyleFromJSON(styleJSON, pointType) {
         radius: styleJSON.image_.radius_,
         radius2: 0,
         angle: 0,
-        rotation: styleJSON.image_.rotation_
+        rotation: styleJSON.image_.rotation_,
       });
     } else if (pointType === "x") {
       image = new RegularShape({
@@ -143,7 +140,7 @@ export function getStyleFromJSON(styleJSON, pointType) {
         radius: styleJSON.image_.radius_,
         radius2: 0,
         angle: Math.PI / 4,
-        rotation: styleJSON.image_.rotation_
+        rotation: styleJSON.image_.rotation_,
       });
     }
   }
@@ -152,7 +149,7 @@ export function getStyleFromJSON(styleJSON, pointType) {
   let style = new Style({
     fill: fill,
     stroke: stroke,
-    image: image
+    image: image,
   });
 
   return style;
@@ -171,22 +168,22 @@ export function getDefaultDrawStyle(drawColor, isText = false, strokeWidth = 3, 
 
   let drawStyle = new Style({
     fill: new Fill({
-      color: color // USE OPACITY
+      color: color, // USE OPACITY
     }),
     stroke: new Stroke({
       color: geometryType === "Polygon" || geometryType === "Circle" ? [0, 0, 0, 0.8] : color,
-      width: strokeWidth
+      width: strokeWidth,
     }),
     image: new CircleStyle({
-      radius: 1,
+      radius: 4,
       stroke: new Stroke({
         color: isText ? color : [0, 0, 0, initialOpacity],
-        width: strokeWidth
+        width: strokeWidth,
       }),
       fill: new Fill({
-        color: color
-      })
-    })
+        color: color,
+      }),
+    }),
   });
 
   return drawStyle;
@@ -208,8 +205,8 @@ export function getPointStyle(pointType = "circle", radius = 5, strokeColor = "b
       image: new CircleStyle({
         radius: radius,
         stroke: stroke,
-        fill: fill
-      })
+        fill: fill,
+      }),
     });
   }
 
@@ -222,8 +219,8 @@ export function getPointStyle(pointType = "circle", radius = 5, strokeColor = "b
         points: 4,
         radius: radius,
         angle: Math.PI / 4,
-        rotation: rotation
-      })
+        rotation: rotation,
+      }),
     });
   } else if (pointType === "triangle") {
     style = new Style({
@@ -234,20 +231,25 @@ export function getPointStyle(pointType = "circle", radius = 5, strokeColor = "b
         radius: radius,
         //rotation: Math.PI / 4,
         rotation: rotation,
-        angle: 0
-      })
+        angle: 0,
+      }),
     });
   } else if (pointType === "star") {
+    let radius2 = 0;
+    if (radius < 15) radius2 = 4;
+    else if (radius > 15 && radius < 40) radius2 = 8;
+    else if (radius > 40 && radius < 70) radius2 = 16;
+    else radius2 = 22;
     style = new Style({
       image: new RegularShape({
         fill: fill,
         stroke: stroke,
         points: 5,
         radius: radius,
-        radius2: 4,
+        radius2: radius2,
         angle: 0,
-        rotation: rotation
-      })
+        rotation: rotation,
+      }),
     });
   } else if (pointType === "cross") {
     style = new Style({
@@ -258,8 +260,8 @@ export function getPointStyle(pointType = "circle", radius = 5, strokeColor = "b
         radius: radius,
         radius2: 0,
         angle: 0,
-        rotation: rotation
-      })
+        rotation: rotation,
+      }),
     });
   } else if (pointType === "x") {
     style = new Style({
@@ -270,8 +272,8 @@ export function getPointStyle(pointType = "circle", radius = 5, strokeColor = "b
         radius: radius,
         radius2: 0,
         angle: Math.PI / 4,
-        rotation: rotation
-      })
+        rotation: rotation,
+      }),
     });
   }
 
@@ -287,7 +289,7 @@ export function getLineStringStyle(strokeColor = "black", strokeWidth = 2, strok
   }
 
   let style = new Style({
-    stroke: stroke
+    stroke: stroke,
   });
 
   return style;
@@ -305,7 +307,7 @@ export function getPolygonStyle(strokeColor = "black", strokeWidth = 2, fillColo
 
   let style = new Style({
     fill: fill,
-    stroke: stroke
+    stroke: stroke,
   });
 
   return style;
@@ -315,7 +317,6 @@ export function getPolygonStyle(strokeColor = "black", strokeWidth = 2, fillColo
 // export function getPointStyleType(style){
 //   if (style.image_.points_ !== undefined && style.image_.points_ === 4 && )
 // }
-
 
 // BUG https://github.com/openlayers/openlayers/issues/3610
 //Control active state of double click zoom interaction
@@ -391,7 +392,7 @@ export function convertLineToArrow(geometry) {
 }
 
 export function importMyMaps(id, callback2) {
-  helpers.getJSON(`${mainConfig.apiUrl}getMyMaps/${id}`, result => {
+  helpers.getJSON(`${mainConfig.apiUrl}getMyMaps/${id}`, (result) => {
     //helpers.getJSON(`http://localhost:8085/getMyMaps/${id}`, result => {
     console.log(result);
     callback2(result);
@@ -399,13 +400,13 @@ export function importMyMaps(id, callback2) {
 }
 
 export function exportMyMaps(callback2, id = null) {
-  const storage = localStorage.getItem("My Drawing");
+  const storage = localStorage.getItem(mainConfig.storageKeys.Draw);
   if (storage === null) return [];
   const data = JSON.parse(storage);
 
   let item = null;
   if (id !== null) {
-    item = data.items.filter(item => {
+    item = data.items.filter((item) => {
       return item.id === id;
     })[0];
 
@@ -415,15 +416,15 @@ export function exportMyMaps(callback2, id = null) {
     }
   }
 
-  helpers.postJSON(mainConfig.apiUrl + "postMyMaps/", data, result => {
+  helpers.postJSON(mainConfig.apiUrl + "postMyMaps/", data, (result) => {
     callback2(result);
   });
 }
 
-function _radians(n) {
+export function _radians(n) {
   return n * (Math.PI / 180);
 }
-function _degrees(n) {
+export function _degrees(n) {
   return n * (180 / Math.PI);
 }
 

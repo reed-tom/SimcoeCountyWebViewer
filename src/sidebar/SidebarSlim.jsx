@@ -16,8 +16,9 @@ class SidebarSlim extends Component {
       <div className={window.sidebarOpen ? "sc-hidden" : "sc-sidebar-slim-container"}>
         <SlimButton title="Layers" image="legend-32x32.png" onClick={() => {window.emitter.emit("activateTab", "layers");}} isSelected={this.props.tabIndex === 0}/>
         <SlimButton title="Tools" image="tools-32x32.png" onClick={() => {window.emitter.emit("activateTab", "tools");}} isSelected={this.props.tabIndex === 1}/>
-        <SlimButton title="Draw" image="map-32x32.png" onClick={() => {window.emitter.emit("activateTab", "mymaps");}} isSelected={ this.props.tabIndex === 2}/>
-        <SlimButton title="Reports" image="report-32x32.png" onClick={() => {window.emitter.emit("activateTab", "reports");}} isSelected={this.props.tabIndex === 3}/>
+        <SlimButton title="My Maps" image="map-32x32.png" onClick={() => {window.emitter.emit("activateTab", "mymaps");}} isSelected={ this.props.tabIndex === 2}/>
+        <SlimButton title="Themes" image="theme-32x32.png" onClick={() => {window.emitter.emit("activateTab", "themes");}} isSelected={ this.props.tabIndex === 3}/>
+        <SlimButton title="Reports" image="report-32x32.png" onClick={() => {window.emitter.emit("activateTab", "reports");}} isSelected={this.props.tabIndex === 4}/>
         <div className="sc-sidebar-slim-footer-container">
           <MenuButton />
         </div>
